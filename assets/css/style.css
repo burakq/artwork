@@ -1,0 +1,34 @@
+/**
+ * Artwork Auth - Temel CSS
+ */
+
+/* Genel stiller */
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+/* Thumbnail stili */
+.artwork-thumbnail {
+    max-width: 100px;
+    height: auto;
+}
+
+/* Tablo stili */
+.table th {
+    white-space: nowrap;
+}
+
+/* Menü stili düzeltmeleri */
+.nav-sidebar .menu-open > .nav-treeview {
+    display: block !important;
+}
+
+.nav-sidebar .nav-item > .nav-link {
+    cursor: pointer;
+}
+
+/* Açılış animasyonu için */
+.nav-sidebar .nav-treeview {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+} 

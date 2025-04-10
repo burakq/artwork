@@ -1,0 +1,70 @@
+[08-Apr-2025 17:00:52 UTC] Geçersiz doğrulama kodu denemesi: ABC12344 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:30:23 UTC] Geçersiz doğrulama kodu denemesi: B3GMBS0KKT101120101 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:31:26 UTC] Eski doğrulama kodu doğrulandı: B3GMBS0KKT101120101 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:32:10 UTC] Eski doğrulama kodu doğrulandı: GZKLGLY7GT261220002 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:35:23 UTC] Geçersiz doğrulama kodu denemesi: v | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:35:25 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:38:10 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: curl/8.7.1
+[09-Apr-2025 03:38:16 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:38:18 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:38:52 UTC] Proxy başlatıldı. URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:38:52 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:38:53 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8
+[09-Apr-2025 03:39:34 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:39:34 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:39:35 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:39:35 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:24 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:24 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:25 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:25 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:51 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:40:51 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:51 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:53 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:40:53 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:41:23 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:41:23 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:41:25 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:41:25 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:42:25 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:42:25 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:42:26 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:42:26 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:18 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:18 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:19 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:19 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:53 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:43:53 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:53 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:54 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:43:54 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:04 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:44:04 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:04 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:05 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:05 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:19 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:44:19 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:19 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:19 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:19 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:20 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:20 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:21 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:21 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:22 UTC] Eski doğrulama kodu doğrulandı: 3EPLS93Z2W4WQ030120251 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:44:22 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:22 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:23 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:44:23 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2023/02/devrim-erbil-eylul-mavi-istanbul.jpg
+[09-Apr-2025 03:45:08 UTC] Eski doğrulama kodu doğrulandı: 6KZM3B67TF100820146 | IP: ::1 | User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+[09-Apr-2025 03:45:08 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:08 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:09 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:09 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:10 UTC] Proxy başlatıldı. İstek detayları: IP=::1, URL=https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:10 UTC] Proxy işlemde: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:12 UTC] Proxy cevap: HTTP 404, ContentType: text/html; charset=UTF-8, Boyut: -1 Final URL: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
+[09-Apr-2025 03:45:12 UTC] Proxy HTTP hata: 404 URL: https://www.devrimerbil.com/wp-content/uploads/2014/8/Mürdüm-Sakarya-1082014.jpg
