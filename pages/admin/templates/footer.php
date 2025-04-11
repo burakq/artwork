@@ -6,7 +6,7 @@
         <strong>Copyright &copy; 2023 <a href="#">Artwork Auth</a>.</strong>
         Tüm hakları saklıdır.
         <div class="float-right d-none d-sm-inline-block">
-            <b>Versiyon</b> 1.0.0
+            <b>Versiyon</b> 1.0.1-beta
         </div>
     </footer>
 </div>

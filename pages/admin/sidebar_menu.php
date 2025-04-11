@@ -148,6 +148,31 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </li>
     </ul>
 </nav>
-<!-- /.sidebar-menu --> 
+<!-- /.sidebar-menu -->
+
+<script>
+// Sidebar menü davranışını düzelt - doğrudan sidebar_menu.php içinde
+$(document).ready(function() {
+    // Sayfa yüklendiğinde doğru menüyü açık tut
+    $('.nav-item.menu-open > .nav-link').addClass('active');
+    
+    // Aktif menülerin kapanmasını engelle
+    $('[data-widget="treeview"]').on('collapsed.lte.treeview', function(event) {
+        const $navItem = $(event.target);
+        if ($navItem.find('.nav-link.active').length > 0) {
+            setTimeout(function() {
+                $navItem.addClass('menu-open');
+                $navItem.find('> .nav-treeview').slideDown();
+            }, 10);
+        }
+    });
+    
+    // Doğrulama Kayıtları menüsüne özel davranış
+    if ($('a[href="verification_logs.php"]').hasClass('active')) {
+        $('a[href="verification_logs.php"]').parents('.nav-sidebar').find('.menu-open').removeClass('menu-open');
+        $('a[href="verification_logs.php"]').parents('.nav-sidebar').find('.nav-treeview:visible').slideUp();
+    }
+});
+</script>
  
  
