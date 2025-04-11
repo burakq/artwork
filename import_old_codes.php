@@ -450,3 +450,7 @@ echo "Toplam eski doğrulama kodu sayısı: <b>" . $countRow['count'] . "</b><br
 $conn->close();
 echo "<br>Veritabanı bağlantısı kapatıldı.";
 ?> 
+ 
+ 
+ 
+ 

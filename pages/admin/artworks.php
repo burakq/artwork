@@ -52,259 +52,153 @@ if ($result && $result->num_rows > 0) {
 
 // Bağlantıyı kapat
 $conn->close();
+
+// Sayfa başlığı ve breadcrumb
+$page_title = "Sanat Eserleri";
+$breadcrumb = '<li class="breadcrumb-item"><a href="dashboard.php">Ana Sayfa</a></li>
+               <li class="breadcrumb-item active">Sanat Eserleri</li>';
+
+// DataTables için ek CSS
+$additional_css = '
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+<style>
+.artwork-thumbnail {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
+}
+</style>';
+
+// Header'ı dahil et
+include 'templates/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Artwork Auth | Sanat Eserleri</title>
-    
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css">
-    <!-- AdminLTE 3 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-    <!-- Custom CSS -->
-    <link href="../../assets/css/style.css" rel="stylesheet">
-</head>
-<body class="hold-transition sidebar-mini">
-<div class="wrapper">
 
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-        <!-- Left navbar links -->
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-            </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="dashboard.php" class="nav-link">Ana Sayfa</a>
-            </li>
-        </ul>
-
-        <!-- Right navbar links -->
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="../../logout.php" role="button">
-                    <i class="fas fa-sign-out-alt"></i> Çıkış Yap
-                </a>
-            </li>
-        </ul>
-    </nav>
-    <!-- /.navbar -->
-
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <!-- Brand Logo -->
-        <a href="dashboard.php" class="brand-link">
-            <span class="brand-text font-weight-light">Artwork Auth</span>
-        </a>
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- Sidebar user panel (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin'; ?></a>
-                </div>
-            </div>
-
-            <?php include 'sidebar_menu.php'; ?>
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Sanat Eserleri Listesi</h3>
+        <div class="card-tools">
+            <a href="artwork_add.php" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Yeni Eser Ekle
+            </a>
         </div>
-        <!-- /.sidebar -->
-    </aside>
-
-    <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <div class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0">Sanat Eserleri</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="dashboard.php">Ana Sayfa</a></li>
-                            <li class="breadcrumb-item active">Sanat Eserleri</li>
-                        </ol>
-                    </div>
-                </div>
+    </div>
+    <div class="card-body">
+        <?php if (!empty($message)): ?>
+            <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <?php echo $message; ?>
             </div>
-        </div>
-        <!-- /.content-header -->
-
-        <!-- Main content -->
-        <section class="content">
-            <div class="container-fluid">
-                <?php if (!empty($message)): ?>
-                <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <?php echo $message; ?>
-                </div>
-                <?php endif; ?>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Sanat Eserleri Listesi</h3>
-                        <div class="card-tools">
-                            <a href="artwork_add.php" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus"></i> Yeni Eser Ekle
+        <?php endif; ?>
+        
+        <table id="artworksTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Resim</th>
+                    <th>Başlık</th>
+                    <th>Sanatçı</th>
+                    <th>Durum</th>
+                    <th>Doğrulama Kodu</th>
+                    <th>Fiyat</th>
+                    <th>Oluşturulma Tarihi</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($artworks as $artwork): ?>
+                <tr>
+                    <td><?php echo $artwork['id']; ?></td>
+                    <td>
+                        <?php if (!empty($artwork['image_path'])): ?>
+                            <img src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo htmlspecialchars($artwork['title']); ?>" class="artwork-thumbnail">
+                        <?php else: ?>
+                            <span class="badge badge-secondary">Resim Yok</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo htmlspecialchars($artwork['title']); ?></td>
+                    <td><?php echo htmlspecialchars($artwork['artist_name']); ?></td>
+                    <td>
+                        <?php
+                        $statusClass = 'secondary';
+                        $statusText = 'Bilinmiyor';
+                        switch ($artwork['status']) {
+                            case 'original':
+                                $statusClass = 'primary';
+                                $statusText = 'Orijinal';
+                                break;
+                            case 'for_sale':
+                                $statusClass = 'success';
+                                $statusText = 'Satışta';
+                                break;
+                            case 'sold':
+                                $statusClass = 'info';
+                                $statusText = 'Satıldı';
+                                break;
+                            case 'reserved':
+                                $statusClass = 'warning';
+                                $statusText = 'Rezerve';
+                                break;
+                            case 'not_for_sale':
+                                $statusClass = 'danger';
+                                $statusText = 'Satılık Değil';
+                                break;
+                        }
+                        ?>
+                        <span class="badge badge-<?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                    </td>
+                    <td><?php echo $artwork['verification_code']; ?></td>
+                    <td><?php echo number_format($artwork['price'], 2, ',', '.') . ' ₺'; ?></td>
+                    <td><?php echo date('d.m.Y H:i', strtotime($artwork['created_at'])); ?></td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="artwork_view.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-info" title="Görüntüle">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="artwork_edit.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-warning" title="Düzenle">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-danger" title="Sil">
+                                <i class="fas fa-trash"></i>
                             </a>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <table id="artworksTable" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Resim</th>
-                                    <th>Başlık</th>
-                                    <th>Sanatçı</th>
-                                    <th>Durum</th>
-                                    <th>Doğrulama Kodu</th>
-                                    <th>Fiyat</th>
-                                    <th>Oluşturulma Tarihi</th>
-                                    <th>İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($artworks as $artwork): ?>
-                                <tr>
-                                    <td><?php echo $artwork['id']; ?></td>
-                                    <td>
-                                        <?php if (!empty($artwork['image_path'])): ?>
-                                            <img src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo $artwork['title']; ?>" class="artwork-thumbnail">
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary">Resim Yok</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo $artwork['title']; ?></td>
-                                    <td><?php echo $artwork['artist_name']; ?></td>
-                                    <td>
-                                        <?php
-                                        $statusClass = 'secondary';
-                                        switch ($artwork['status']) {
-                                            case 'original':
-                                                $statusClass = 'primary';
-                                                $statusText = 'Orijinal';
-                                                break;
-                                            case 'for_sale':
-                                                $statusClass = 'success';
-                                                $statusText = 'Satışta';
-                                                break;
-                                            case 'sold':
-                                                $statusClass = 'warning';
-                                                $statusText = 'Satıldı';
-                                                break;
-                                            case 'fake':
-                                                $statusClass = 'danger';
-                                                $statusText = 'Sahte';
-                                                break;
-                                            case 'archived':
-                                                $statusClass = 'info';
-                                                $statusText = 'Arşivlendi';
-                                                break;
-                                            default:
-                                                $statusText = $artwork['status'];
-                                        }
-                                        ?>
-                                        <span class="badge bg-<?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info"><?php echo $artwork['verification_code']; ?></span>
-                                    </td>
-                                    <td><?php echo number_format($artwork['price'], 2, ',', '.') . ' ₺'; ?></td>
-                                    <td><?php echo date('d.m.Y H:i', strtotime($artwork['created_at'])); ?></td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="artwork_view.php?id=<?php echo $artwork['id']; ?>" class="btn btn-info btn-sm">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="artwork_edit.php?id=<?php echo $artwork['id']; ?>" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="javascript:void(0);" onclick="confirmDelete(<?php echo $artwork['id']; ?>)" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-    
-    <footer class="main-footer">
-        <strong>Copyright &copy; 2023 <a href="#">Artwork Auth</a>.</strong>
-        Tüm hakları saklıdır.
-        <div class="float-right d-none d-sm-inline-block">
-            <b>Versiyon</b> 1.0.0
-        </div>
-    </footer>
-</div>
-<!-- ./wrapper -->
-
-<!-- Silme Onay Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Silme Onayı</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Bu eseri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Sil</a>
-            </div>
-        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap 5 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<?php
+// DataTables için ek JavaScript
+$additional_js = '
 <!-- DataTables -->
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
-<!-- AdminLTE 3 App -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
 <script>
-$(document).ready(function () {
-    $('#artworksTable').DataTable({
-        "paging": true,
-        "lengthChange": true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
+$(document).ready(function() {
+    $("#artworksTable").DataTable({
         "responsive": true,
+        "autoWidth": false,
         "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.12.1/i18n/tr.json"
+            "url": "//cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json"
         }
     });
 });
 
 function confirmDelete(id) {
-    var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    document.getElementById('confirmDeleteBtn').href = 'artworks.php?delete=' + id;
-    modal.show();
+    if (confirm("Bu eseri silmek istediğinize emin misiniz?")) {
+        window.location.href = "?delete=" + id;
+    }
 }
-</script>
-</body>
-</html> 
+</script>';
+
+// Footer'ı dahil et
+include 'templates/footer.php';
+?> 

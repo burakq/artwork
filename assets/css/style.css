@@ -32,3 +32,41 @@ body {
     overflow: hidden;
     transition: max-height 0.3s ease;
 } 
+/* Tablo Stilleri */
+.table th {
+    border-top: 0;
+    background-color: #f8f9fa;
+}
+
+/* Admin Panel Özellikleri */
+.sidebar-dark-primary {
+    background-color: #343a40;
+}
+
+.main-header {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.main-footer {
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    color: #6c757d;
+    padding: .8rem;
+}
+
+/* Custom Stiller */
+.artwork-thumbnail {
+    max-width: 100px;
+    height: auto;
+}
+
+/* Responsive Ayarlar */
+@media (max-width: 768px) {
+    .small-box {
+        margin-bottom: 1.25rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+} 

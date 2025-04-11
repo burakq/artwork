@@ -55,6 +55,17 @@ if ($result->num_rows > 0) {
 }
 $stmt->close();
 
+// Teknikleri getir
+$techniques = [];
+$query = "SELECT * FROM artwork_techniques WHERE is_active = 1 ORDER BY technique_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $techniques[$row['technique_key']] = $row['technique_name'];
+    }
+}
+
 // Bağlantıyı kapat
 $conn->close();
 ?>
@@ -247,12 +258,11 @@ $conn->close();
                                                 <td><?php echo $artwork['year']; ?></td>
                                             </tr>
                                             <?php endif; ?>
-                                            <?php if (!empty($artwork['technique'])): ?>
+                                            <!-- Teknik bilgisi -->
                                             <tr>
                                                 <th>Teknik</th>
-                                                <td><?php echo $artwork['technique']; ?></td>
+                                                <td><?php echo isset($techniques[$artwork['technique']]) ? htmlspecialchars($techniques[$artwork['technique']]) : htmlspecialchars($artwork['technique']); ?></td>
                                             </tr>
-                                            <?php endif; ?>
                                             <?php if (!empty($artwork['location'])): ?>
                                             <tr>
                                                 <th>Konum</th>
@@ -387,3 +397,7 @@ function copyVerificationLink() {
 </script>
 </body>
 </html> 
+ 
+ 
+ 
+ 

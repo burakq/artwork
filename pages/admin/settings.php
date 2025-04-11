@@ -161,13 +161,6 @@ $conn->close();
 
             <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="info">
-                        <a href="#" class="d-block"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin'; ?></a>
-                    </div>
-                </div>
-
                 <?php include 'sidebar_menu.php'; ?>
             </div>
         </aside>
@@ -283,6 +276,60 @@ $conn->close();
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- GitHub Güncelleme Kartı -->
+                            <div class="card card-success mt-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">GitHub Güncellemeleri</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>GitHub Güncelleme Durumu</label>
+                                        <div id="github-status" class="alert alert-info">
+                                            <i class="fas fa-sync fa-spin"></i> Güncelleme durumu kontrol ediliyor...
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-success btn-block" id="check-updates">
+                                            <i class="fas fa-sync"></i> Güncellemeleri Kontrol Et
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-block mt-2" id="apply-updates" style="display: none;">
+                                            <i class="fas fa-download"></i> Güncellemeleri Uygula
+                                        </button>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <h5><i class="icon fas fa-exclamation-triangle"></i> Önemli!</h5>
+                                        <p>Güncelleme yapmadan önce tüm değişikliklerinizi kaydettiğinizden emin olun.</p>
+                                        <p>Güncelleme sırasında sistem geçici olarak kullanılamaz hale gelebilir.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- MySQL Yedek Kartı -->
+                            <div class="card card-warning mt-4">
+                                <div class="card-header">
+                                    <h3 class="card-title">MySQL Yedek İndirme</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label>Veritabanı Yedeği</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="backup_password" placeholder="Yedek şifresini girin">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-warning" type="button" id="download-backup">
+                                                    <i class="fas fa-download"></i> Yedeği İndir
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-muted">Yedek almak için şifre girin ve "Yedeği İndir" butonuna tıklayın.</small>
+                                    </div>
+                                    <div class="alert alert-info">
+                                        <h5><i class="icon fas fa-info"></i> Bilgi</h5>
+                                        <p>Yedek dosyası, veritabanının tam bir kopyasını içerir.</p>
+                                        <p>Yedek almak için ana admin şifrenizi veya yedek şifresini kullanabilirsiniz.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -322,6 +369,97 @@ $conn->close();
             $("[data-widget='pushmenu']").on('click', function() {
                 $('body').toggleClass('sidebar-collapse');
             });
+            
+            // GitHub güncelleme kontrolü
+            function checkGitHubUpdates() {
+                $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncelleme durumu kontrol ediliyor...');
+                $('#github-status').removeClass('alert-success alert-danger').addClass('alert-info');
+                
+                $.ajax({
+                    url: 'check_github_updates.php',
+                    method: 'GET',
+                    success: function(response) {
+                        try {
+                            const data = JSON.parse(response);
+                            if (data.hasUpdates) {
+                                $('#github-status').html('<i class="fas fa-exclamation-circle"></i> Yeni güncelleme mevcut: ' + data.latestVersion);
+                                $('#github-status').removeClass('alert-info').addClass('alert-success');
+                                $('#apply-updates').show();
+                            } else {
+                                $('#github-status').html('<i class="fas fa-check-circle"></i> Sistem güncel. Son sürüm: ' + data.currentVersion);
+                                $('#github-status').removeClass('alert-info').addClass('alert-success');
+                                $('#apply-updates').hide();
+                            }
+                        } catch (e) {
+                            $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu.');
+                            $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                        }
+                    },
+                    error: function() {
+                        $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu.');
+                        $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                    }
+                });
+            }
+            
+            // Güncellemeleri kontrol et butonu
+            $('#check-updates').on('click', function() {
+                checkGitHubUpdates();
+            });
+            
+            // Güncellemeleri uygula butonu
+            $('#apply-updates').on('click', function() {
+                if (confirm('Güncellemeleri uygulamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+                    $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncellemeler uygulanıyor...');
+                    $('#github-status').removeClass('alert-success alert-danger').addClass('alert-info');
+                    $('#check-updates, #apply-updates').prop('disabled', true);
+                    
+                    $.ajax({
+                        url: 'apply_github_updates.php',
+                        method: 'POST',
+                        success: function(response) {
+                            try {
+                                const data = JSON.parse(response);
+                                if (data.success) {
+                                    $('#github-status').html('<i class="fas fa-check-circle"></i> Güncellemeler başarıyla uygulandı. Sayfa yenilenecek...');
+                                    $('#github-status').removeClass('alert-info').addClass('alert-success');
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 3000);
+                                } else {
+                                    $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu: ' + data.message);
+                                    $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                                    $('#check-updates, #apply-updates').prop('disabled', false);
+                                }
+                            } catch (e) {
+                                $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu.');
+                                $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                                $('#check-updates, #apply-updates').prop('disabled', false);
+                            }
+                        },
+                        error: function() {
+                            $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu.');
+                            $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                            $('#check-updates, #apply-updates').prop('disabled', false);
+                        }
+                    });
+                }
+            });
+            
+            // Yedek indirme butonu
+            $('#download-backup').on('click', function() {
+                var password = $('#backup_password').val();
+                if (!password) {
+                    alert('Lütfen yedek şifresini girin.');
+                    return;
+                }
+                
+                // Yedek indirme isteği
+                window.location.href = 'download_backup.php?password=' + encodeURIComponent(password);
+            });
+            
+            // Sayfa yüklendiğinde güncelleme durumunu kontrol et
+            checkGitHubUpdates();
         });
     </script>
 </body>

@@ -141,13 +141,6 @@ $conn->close();
 
         <!-- Sidebar -->
         <div class="sidebar">
-            <!-- Sidebar user panel (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block"><?php echo $_SESSION['user_name']; ?></a>
-                </div>
-            </div>
-
             <?php include 'sidebar_menu.php'; ?>
         </div>
     </aside>
@@ -515,3 +508,7 @@ $(document).ready(function() {
 </script>
 </body>
 </html> 
+ 
+ 
+ 
+ 

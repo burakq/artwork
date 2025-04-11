@@ -21,6 +21,50 @@ if (!file_exists('../../' . $uploadDir)) {
     mkdir('../../' . $uploadDir, 0777, true);
 }
 
+// Durumları getir
+$statuses = [];
+$query = "SELECT * FROM artwork_statuses WHERE is_active = 1 ORDER BY status_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $statuses[$row['status_key']] = $row['status_name'];
+    }
+}
+
+// Teknikleri getir
+$techniques = [];
+$query = "SELECT * FROM artwork_techniques WHERE is_active = 1 ORDER BY technique_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $techniques[$row['technique_key']] = $row['technique_name'];
+    }
+}
+
+// Baskı türlerini getir
+$edition_types = [];
+$query = "SELECT * FROM artwork_edition_types WHERE is_active = 1 ORDER BY edition_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $edition_types[$row['edition_key']] = $row['edition_name'];
+    }
+}
+
+// Konumları getir
+$locations = [];
+$query = "SELECT * FROM artwork_locations WHERE is_active = 1 ORDER BY location_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $locations[$row['location_key']] = $row['location_name'];
+    }
+}
+
 // Form gönderildi mi kontrol et
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Form verilerini al
@@ -31,6 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $year = filter_var($_POST['year'], FILTER_VALIDATE_INT);
     $technique = sanitize($_POST['technique']);
     $status = sanitize($_POST['status']);
+    $edition_type = sanitize($_POST['edition_type']);
+    $edition_number = sanitize($_POST['edition_number']);
+    $first_owner = sanitize($_POST['first_owner']);
     $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
     $width = filter_var($_POST['width'], FILTER_VALIDATE_FLOAT);
     $height = filter_var($_POST['height'], FILTER_VALIDATE_FLOAT);
@@ -68,13 +115,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     // Veritabanına kaydet
     $sql = "INSERT INTO artworks (title, artist_name, description, image_path, location, year, 
-            technique, status, price, verification_code, width, height, depth, dimension_unit, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+            technique, status, edition_type, edition_number, first_owner, price, verification_code, 
+            width, height, depth, dimension_unit, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssissdsddss", 
+    $stmt->bind_param("sssssisssssdsdddss", 
         $title, $artist_name, $description, $image_path, $location, $year, 
-        $technique, $status, $price, $verification_code, $width, $height, $depth, $dimension_unit);
+        $technique, $status, $edition_type, $edition_number, $first_owner, $price, 
+        $verification_code, $width, $height, $depth, $dimension_unit);
     
     if ($stmt->execute()) {
         // Başarıyla eklendi
@@ -154,13 +203,6 @@ function generateVerificationCode() {
 
         <!-- Sidebar -->
         <div class="sidebar">
-            <!-- Sidebar user panel (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin'; ?></a>
-                </div>
-            </div>
-
             <?php include 'sidebar_menu.php'; ?>
         </div>
         <!-- /.sidebar -->
@@ -242,7 +284,12 @@ function generateVerificationCode() {
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="location">Konum</label>
-                                                <input type="text" class="form-control" id="location" name="location">
+                                                <select class="form-control" id="location" name="location">
+                                                    <option value="">Konum Seçin</option>
+                                                    <?php foreach ($locations as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -256,19 +303,51 @@ function generateVerificationCode() {
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="technique">Teknik</label>
-                                                <input type="text" class="form-control" id="technique" name="technique">
+                                                <label>Teknik</label>
+                                                <select class="form-control" name="technique" required>
+                                                    <option value="">Teknik Seçin</option>
+                                                    <?php foreach ($techniques as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="status" class="required">Durum</label>
-                                                <select class="form-control" id="status" name="status" required>
-                                                    <option value="original">Orijinal</option>
-                                                    <option value="for_sale">Satışta</option>
-                                                    <option value="sold">Satıldı</option>
-                                                    <option value="archived">Arşivlendi</option>
+                                                <label>Durum</label>
+                                                <select class="form-control" name="status" required>
+                                                    <option value="">Durum Seçin</option>
+                                                    <?php foreach ($statuses as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="edition_type">Baskı Türü</label>
+                                                <select class="form-control" id="edition_type" name="edition_type">
+                                                    <option value="">Seçiniz</option>
+                                                    <?php foreach ($edition_types as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>"><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="edition_number">Baskı Numarası</label>
+                                                <input type="text" class="form-control" id="edition_number" name="edition_number" placeholder="Örn: 39-49">
+                                                <small class="text-muted">Edition seçilirse baskı numarasını girin (örn: 39-49)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="first_owner">İlk Sahip</label>
+                                                <input type="text" class="form-control" id="first_owner" name="first_owner">
                                             </div>
                                         </div>
                                     </div>

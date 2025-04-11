@@ -42,12 +42,71 @@ if ($result->num_rows === 0) {
 }
 
 $artwork = $result->fetch_assoc();
+
+// NULL değerler için varsayılan değerler ata
+$artwork['edition_number'] = $artwork['edition_number'] ?? '';
+$artwork['first_owner'] = $artwork['first_owner'] ?? '';
+$artwork['price'] = $artwork['price'] ?? 0;
+$artwork['width'] = $artwork['width'] ?? 0;
+$artwork['height'] = $artwork['height'] ?? 0;
+$artwork['depth'] = $artwork['depth'] ?? 0;
+$artwork['dimension_unit'] = $artwork['dimension_unit'] ?? 'cm';
+$artwork['edition_type'] = $artwork['edition_type'] ?? 'unique';
+$artwork['technique'] = $artwork['technique'] ?? '';
+$artwork['status'] = $artwork['status'] ?? 'original';
+$artwork['location'] = $artwork['location'] ?? '';
+$artwork['description'] = $artwork['description'] ?? '';
+
 $stmt->close();
 
 // Dosya yükleme dizini
 $uploadDir = 'uploads/artworks/';
 if (!file_exists('../../' . $uploadDir)) {
     mkdir('../../' . $uploadDir, 0777, true);
+}
+
+// Teknikleri getir
+$techniques = [];
+$query = "SELECT * FROM artwork_techniques WHERE is_active = 1 ORDER BY technique_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $techniques[$row['technique_key']] = $row['technique_name'];
+    }
+}
+
+// Baskı türlerini getir
+$edition_types = [];
+$query = "SELECT * FROM artwork_edition_types WHERE is_active = 1 ORDER BY edition_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $edition_types[$row['edition_key']] = $row['edition_name'];
+    }
+}
+
+// Durumları getir
+$statuses = [];
+$query = "SELECT * FROM artwork_statuses WHERE is_active = 1 ORDER BY status_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $statuses[$row['status_key']] = $row['status_name'];
+    }
+}
+
+// Konumları getir
+$locations = [];
+$query = "SELECT * FROM artwork_locations WHERE is_active = 1 ORDER BY location_name";
+$result = $conn->query($query);
+
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $locations[$row['location_key']] = $row['location_name'];
+    }
 }
 
 // Form gönderildi mi kontrol et
@@ -59,6 +118,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $location = sanitize($_POST['location']);
     $year = filter_var($_POST['year'], FILTER_VALIDATE_INT);
     $technique = sanitize($_POST['technique']);
+    $status = sanitize($_POST['status']);
+    $edition_type = sanitize($_POST['edition_type']);
+    $edition_number = sanitize($_POST['edition_number']);
+    $first_owner = sanitize($_POST['first_owner']);
+    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
+    $width = filter_var($_POST['width'], FILTER_VALIDATE_FLOAT);
+    $height = filter_var($_POST['height'], FILTER_VALIDATE_FLOAT);
+    $depth = filter_var($_POST['depth'], FILTER_VALIDATE_FLOAT);
+    $dimension_unit = sanitize($_POST['dimension_unit']);
     
     // Durum kontrolü - ENUM olduğu için sadece izin verilen değerler kabul edilecek
     $allowed_statuses = array('original', 'for_sale', 'sold', 'fake', 'archived');
@@ -73,12 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     error_log("Kullanılacak durum değeri: " . $status);
-    
-    $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
-    $width = filter_var($_POST['width'], FILTER_VALIDATE_FLOAT);
-    $height = filter_var($_POST['height'], FILTER_VALIDATE_FLOAT);
-    $depth = filter_var($_POST['depth'], FILTER_VALIDATE_FLOAT);
-    $dimension_unit = sanitize($_POST['dimension_unit']);
     
     // Resim yükleme işlemi
     $image_path = $artwork['image_path']; // Mevcut resim yolunu koru
@@ -120,6 +182,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             location = ?, 
             year = ?, 
             technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
             price = ?, 
             width = ?, 
             height = ?, 
@@ -129,9 +195,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssiddddssi", 
+    $stmt->bind_param("sssssisssssddddssi", 
         $title, $artist_name, $description, $image_path, $location, $year, 
-        $technique, $price, $width, $height, $depth, $dimension_unit, $id);
+        $technique, $status, $edition_type, $edition_number, $first_owner, $price, 
+        $width, $height, $depth, $dimension_unit, $id);
     
     if ($stmt->execute()) {
         // Status değerini ayrı bir sorguda güncelleyelim
@@ -295,7 +362,12 @@ $conn->close();
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="location">Konum</label>
-                                                <input type="text" class="form-control" id="location" name="location" value="<?php echo $artwork['location']; ?>">
+                                                <select class="form-control" id="location" name="location">
+                                                    <option value="">Konum Seçin</option>
+                                                    <?php foreach ($locations as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $artwork['location'] == $key ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -309,20 +381,51 @@ $conn->close();
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="technique">Teknik</label>
-                                                <input type="text" class="form-control" id="technique" name="technique" value="<?php echo $artwork['technique']; ?>">
+                                                <label>Teknik</label>
+                                                <select class="form-control" name="technique" required>
+                                                    <option value="">Teknik Seçin</option>
+                                                    <?php foreach ($techniques as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($artwork['technique'] == $key) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="status">Durum</label>
-                                                <select class="form-control" id="status" name="status" required>
-                                                    <option value="original" <?php echo ($artwork['status'] == 'original') ? 'selected' : ''; ?>>Orijinal</option>
-                                                    <option value="for_sale" <?php echo ($artwork['status'] == 'for_sale') ? 'selected' : ''; ?>>Satışta</option>
-                                                    <option value="sold" <?php echo ($artwork['status'] == 'sold') ? 'selected' : ''; ?>>Satıldı</option>
-                                                    <option value="fake" <?php echo ($artwork['status'] == 'fake') ? 'selected' : ''; ?>>Sahte</option>
-                                                    <option value="archived" <?php echo ($artwork['status'] == 'archived') ? 'selected' : ''; ?>>Arşivlenmiş</option>
+                                                <label>Durum</label>
+                                                <select class="form-control" name="status" required>
+                                                    <option value="">Durum Seçin</option>
+                                                    <?php foreach ($statuses as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($artwork['status'] == $key) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="edition_type">Baskı Türü</label>
+                                                <select class="form-control" id="edition_type" name="edition_type">
+                                                    <option value="">Seçiniz</option>
+                                                    <?php foreach ($edition_types as $key => $name): ?>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($artwork['edition_type'] == $key) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="edition_number">Baskı Numarası</label>
+                                                <input type="text" class="form-control" id="edition_number" name="edition_number" placeholder="Örn: 39-49" value="<?php echo htmlspecialchars($artwork['edition_number']); ?>">
+                                                <small class="text-muted">Edition seçilirse baskı numarasını girin (örn: 39-49)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="first_owner">İlk Sahip</label>
+                                                <input type="text" class="form-control" id="first_owner" name="first_owner" value="<?php echo htmlspecialchars($artwork['first_owner']); ?>">
                                             </div>
                                         </div>
                                     </div>
