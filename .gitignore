@@ -1,0 +1,19 @@
+# Database configuration
+config/db.php
+
+# Environment files
+.env
+
+# IDE files
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Cache files
+*.cache 
