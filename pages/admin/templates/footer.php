@@ -9,7 +9,14 @@
                     <p class="mb-0">© <?php echo date('Y'); ?> Artwork Authentication. Tüm hakları saklıdır.</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="mb-0">Version: <?php include_once '../../../version.txt'; ?></p>
+                    <p class="mb-0">Version: <?php 
+                        $versionFile = __DIR__ . '/../../../../version.txt';
+                        if (file_exists($versionFile)) {
+                            echo file_get_contents($versionFile);
+                        } else {
+                            echo 'v1.0.5';
+                        }
+                    ?></p>
                 </div>
             </div>
         </div>
