@@ -2,11 +2,16 @@
         </section>
     </div>
 
-    <footer class="main-footer">
-        <strong>Copyright &copy; 2023 <a href="#">Artwork Auth</a>.</strong>
-        Tüm hakları saklıdır.
-        <div class="float-right d-none d-sm-inline-block">
-            <b>Versiyon</b> 1.0.1-beta
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">© <?php echo date('Y'); ?> Artwork Authentication. Tüm hakları saklıdır.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-0">Version: <?php include_once '../../../version.txt'; ?></p>
+                </div>
+            </div>
         </div>
     </footer>
 </div>
