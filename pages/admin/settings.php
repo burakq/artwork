@@ -351,7 +351,7 @@ $conn->close();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
+    <!-- AdminLTE 3 -->
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
     <!-- Custom JS -->
     <script src="../../assets/js/script.js"></script>
@@ -456,6 +456,34 @@ $conn->close();
                 
                 // Yedek indirme isteği
                 window.location.href = 'download_backup.php?password=' + encodeURIComponent(password);
+            });
+            
+            // WhatsApp numarası formatını kontrol et
+            $('#whatsapp_number').on('input', function() {
+                var value = $(this).val();
+                if (!/^\d+$/.test(value)) {
+                    $(this).val(value.replace(/\D/g, ''));
+                }
+            });
+            
+            // iframe domainlerini kontrol et
+            $('#allowed_iframe_domains').on('input', function() {
+                var value = $(this).val();
+                // Her satırın geçerli bir domain olup olmadığını kontrol et
+                var lines = value.split('\n');
+                var valid = true;
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (line && !/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(line)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (!valid) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
             });
             
             // Sayfa yüklendiğinde güncelleme durumunu kontrol et
