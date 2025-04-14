@@ -19,53 +19,86 @@ $message = '';
 $output = [];
 
 try {
-    // GitHub'dan dosyaları indir
-    $files = [
-        // Kök dizin dosyaları
-        'version.txt' => 'https://raw.githubusercontent.com/burakq/artwork/main/version.txt',
-        'index.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/index.php',
-        'verify.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/verify.php',
-        'contact.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/contact.php',
-        'for_sale.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/for_sale.php',
-        'login.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/login.php',
-        'logout.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/logout.php',
-        'image_proxy.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/image_proxy.php',
+    // GitHub API URL'si
+    $apiUrl = 'https://api.github.com/repos/burakq/artwork/contents';
+    
+    // cURL ile GitHub API'sine istek gönder
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'PHP/ArtworkAuth');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Accept: application/vnd.github.v3+json'
+    ]);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
-        // Admin sayfaları
-        'pages/admin/artwork_techniques.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_techniques.php',
-        'pages/admin/artwork_edition_types.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_edition_types.php',
-        'pages/admin/artwork_editions.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_editions.php',
-        'pages/admin/artworks.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artworks.php',
-        'pages/admin/artwork_add.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_add.php',
-        'pages/admin/artwork_edit.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_edit.php',
-        'pages/admin/artwork_view.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_view.php',
-        'pages/admin/artwork_locations.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_locations.php',
-        'pages/admin/artwork_statuses.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/artwork_statuses.php',
-        'pages/admin/customers.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/customers.php',
-        'pages/admin/customer_add.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/customer_add.php',
-        'pages/admin/customer_edit.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/customer_edit.php',
-        'pages/admin/customer_view.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/customer_view.php',
-        'pages/admin/orders.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/orders.php',
-        'pages/admin/order_view.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/order_view.php',
-        'pages/admin/verification_logs.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/verification_logs.php',
-        'pages/admin/users.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/users.php',
-        'pages/admin/user_add.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/user_add.php',
-        'pages/admin/user_edit.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/user_edit.php',
-        'pages/admin/settings.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/settings.php',
-        'pages/admin/sidebar_menu.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/sidebar_menu.php',
-        'pages/admin/dashboard.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/dashboard.php',
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
-        // Template dosyaları
-        'pages/admin/templates/header.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/templates/header.php',
-        'pages/admin/templates/footer.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/templates/footer.php',
-        'pages/admin/templates/sidebar.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/pages/admin/templates/sidebar.php',
+    if ($httpCode !== 200) {
+        throw new Exception('GitHub API\'sine erişilemedi. HTTP Kodu: ' . $httpCode);
+    }
 
-        // Config dosyaları
-        'config/db.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/config/db.php',
+    // Dosya listesini oluştur
+    $files = [];
+    $data = json_decode($response, true);
+    
+    // Recursive olarak dosyaları listele
+    function getFiles($path, $baseUrl) {
+        global $files;
+        
+        $apiUrl = 'https://api.github.com/repos/burakq/artwork/contents/' . $path;
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'PHP/ArtworkAuth');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/vnd.github.v3+json'
+        ]);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
-        // Include dosyaları
-        'includes/functions.php' => 'https://raw.githubusercontent.com/burakq/artwork/main/includes/functions.php'
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200) {
+            $items = json_decode($response, true);
+            foreach ($items as $item) {
+                if ($item['type'] === 'file') {
+                    // Sadece PHP, JS, CSS, HTML ve TXT dosyalarını al
+                    $ext = pathinfo($item['name'], PATHINFO_EXTENSION);
+                    if (in_array($ext, ['php', 'js', 'css', 'html', 'txt'])) {
+                        $files[$item['path']] = 'https://raw.githubusercontent.com/burakq/artwork/main/' . $item['path'];
+                    }
+                } elseif ($item['type'] === 'dir') {
+                    // Alt dizinleri kontrol et
+                    getFiles($item['path'], $baseUrl);
+                }
+            }
+        }
+    }
+
+    // Ana dizinden başla
+    getFiles('', $apiUrl);
+
+    // Önemli dosyaları zorunlu olarak ekle
+    $requiredFiles = [
+        'version.txt',
+        'config/db.php',
+        'includes/functions.php',
+        'pages/admin/templates/header.php',
+        'pages/admin/templates/footer.php',
+        'pages/admin/templates/sidebar.php'
     ];
+
+    foreach ($requiredFiles as $file) {
+        if (!isset($files[$file])) {
+            $files[$file] = 'https://raw.githubusercontent.com/burakq/artwork/main/' . $file;
+        }
+    }
 
     $context = stream_context_create([
         'http' => [
