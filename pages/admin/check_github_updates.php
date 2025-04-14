@@ -13,50 +13,65 @@ if (!isAdmin()) {
     die(json_encode(['error' => 'Bu işlem için yetkiniz yok']));
 }
 
-// GitHub API URL'si
-$githubApiUrl = 'https://api.github.com/repos/burakq/artwork/commits/main';
+// Versiyon dosyası yolu
+$versionFile = '../../version.txt';
 
-// cURL ile GitHub API'sine istek gönder
+// Mevcut versiyonu al
+$currentVersion = '';
+if (file_exists($versionFile)) {
+    $currentVersion = trim(file_get_contents($versionFile));
+}
+
+// Eğer versiyon dosyası okunamadıysa veya boşsa varsayılan değer ata
+if (empty($currentVersion)) {
+    $currentVersion = 'v1.0.0';
+}
+
+// GitHub'dan en son versiyonu al
+$latestVersion = '';
+$githubUrl = 'https://raw.githubusercontent.com/burakq/artwork/main/version.txt';
+
+// cURL ile GitHub'dan versiyon dosyasını al
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $githubApiUrl);
+curl_setopt($ch, CURLOPT_URL, $githubUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_USERAGENT, 'PHP/ArtworkAuth');
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Accept: application/vnd.github.v3+json'
+    'Accept: application/vnd.github.v3.raw'
 ]);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-if ($httpCode !== 200) {
-    die(json_encode([
-        'error' => 'GitHub API\'sine erişilemedi',
-        'httpCode' => $httpCode
-    ]));
+if ($httpCode === 200 && $response !== false) {
+    $latestVersion = trim($response);
 }
 
-// Mevcut commit hash'ini al
-$currentCommit = trim(shell_exec('git rev-parse HEAD'));
-
-// GitHub'dan gelen en son commit hash'ini al
-$githubData = json_decode($response, true);
-$latestCommit = $githubData['sha'];
+// Eğer GitHub'dan versiyon alınamadıysa varsayılan değer ata
+if (empty($latestVersion)) {
+    $latestVersion = $currentVersion;
+}
 
 // Güncelleme var mı kontrol et
-$hasUpdates = $currentCommit !== $latestCommit;
-
-// Versiyon bilgilerini al
-$currentVersion = trim(shell_exec('git describe --tags --always'));
-$latestVersion = $githubData['commit']['message'];
+$hasUpdates = version_compare($latestVersion, $currentVersion, '>');
 
 // Sonuçları döndür
 echo json_encode([
     'hasUpdates' => $hasUpdates,
     'currentVersion' => $currentVersion,
     'latestVersion' => $latestVersion,
-    'currentCommit' => $currentCommit,
-    'latestCommit' => $latestCommit
+    'debug' => [
+        'php_version' => PHP_VERSION,
+        'curl_available' => function_exists('curl_init'),
+        'version_file_exists' => file_exists($versionFile),
+        'http_code' => $httpCode,
+        'response' => $response,
+        'current_version_file' => $currentVersion,
+        'latest_version_github' => $latestVersion
+    ]
 ]); 
  
  
