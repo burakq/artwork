@@ -1,49 +1,77 @@
-# Artwork Auth Yönetim Sistemi
+# PDF to JPEG Converter
 
-Bu proje, sanat eserlerinin kimlik doğrulama ve yönetimini sağlayan bir PHP uygulamasıdır.
+Bu Python scripti, PDF dosyalarını JPEG formatına dönüştürmek için kullanılır. `pdf2image` ve `PIL` kütüphanelerini kullanarak yüksek kaliteli dönüşüm sağlar.
 
 ## Özellikler
 
-- Kullanıcı ve yönetici girişi
-- Sanat eserleri yönetimi
-- Müşteri yönetimi
-- Sipariş takibi
-- Doğrulama kayıtları
-- PDF şablon oluşturma
-
-## Kurulum
-
-1. Dosyaları web sunucunuza yükleyin
-2. MySQL veritabanını oluşturun
-3. Veritabanı ayarlarını `config/db.php` dosyasında yapılandırın
-4. Tarayıcınızda uygulamayı açın
+- PDF dosyalarını JPEG formatına dönüştürme
+- Sayfa başına ayrı JPEG dosyası oluşturma
+- Otomatik boyut optimizasyonu (1024x1448 max)
+- Türkçe karakter desteği
+- Hata yönetimi ve loglama
 
 ## Gereksinimler
 
-- PHP 7.4 veya üzeri
-- MySQL 8.0 veya üzeri
-- MAMP, XAMPP veya benzeri bir local web sunucusu
+- Python 3.6 veya üzeri
+- pdf2image kütüphanesi
+- PIL (Python Imaging Library)
+- poppler-utils
 
-## Veritabanı Tabloları
+## Kurulum
 
-- `users`: Sistem kullanıcıları
-- `artworks`: Sanat eserleri
-- `customers`: Müşteriler
-- `orders`: Siparişler
-- `order_artwork`: Sipariş-eser ilişkisi
-- `verification_logs`: Doğrulama kayıtları
-- `tags`: Etiketler
-- `artwork_tag`: Eser-etiket ilişkisi
-- `pdf_templates`: PDF şablonları
+1. Gerekli kütüphaneleri yükleyin:
+   ```bash
+   pip install pdf2image Pillow
+   ```
 
-## Admin LTE 4 Entegrasyonu
+2. poppler-utils'i yükleyin:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install poppler-utils
 
-Bu projede Admin LTE 4 teması kullanılmıştır. Admin paneli için modern ve duyarlı bir arayüz sağlar.
+   # macOS
+   brew install poppler
+   ```
+
+3. Scripti indirin:
+   ```bash
+   git clone https://github.com/burakq/pdf-to-jpeg.git
+   ```
+
+## Kullanım
+
+1. `INPUT_FOLDER` ve `OUTPUT_FOLDER` değişkenlerini kendi dizinlerinize göre ayarlayın
+2. Scripti çalıştırın:
+   ```bash
+   python pdf-to-jpg.py
+   ```
+
+## Ayarlar
+
+- `INPUT_FOLDER`: PDF dosyalarının bulunduğu dizin
+- `OUTPUT_FOLDER`: JPEG dosyalarının kaydedileceği dizin
+- `MAX_SIZE`: Maksimum çıktı boyutu (oran korunarak)
+
+## Örnek Çıktı
+
+```
+📄 Dönüştürülüyor: example.pdf
+✅ JPEG oluşturuldu: /path/to/output/example_page1.jpg
+✅ JPEG oluşturuldu: /path/to/output/example_page2.jpg
+✅ Tüm PDF dosyaları dönüştürüldü.
+```
+
+## Hata Yönetimi
+
+Script, aşağıdaki durumlarda hata mesajı gösterir:
+- PDF dosyası bulunamadığında
+- Dönüşüm başarısız olduğunda
+- Çıktı dizini oluşturulamadığında
 
 ## Lisans
 
-Bu proje [MIT lisansı](LICENSE) altında lisanslanmıştır.
+MIT License
 
-## İletişim
+## Yazar
 
-Sorularınız veya önerileriniz için lütfen iletişime geçin. 
+Burak Yıldırım - [GitHub](https://github.com/burakq) 
