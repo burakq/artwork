@@ -22,6 +22,14 @@ $stats = [];
 $total_result = $conn->query("SELECT COUNT(*) as total FROM verification_logs WHERE deleted_at IS NULL");
 $stats['total'] = ($total_result && $row = $total_result->fetch_assoc()) ? $row['total'] : 0;
 
+// Bugünkü doğrulama sayısı
+$today_result = $conn->query("SELECT COUNT(*) as today FROM verification_logs WHERE DATE(created_at) = CURDATE() AND deleted_at IS NULL");
+$stats['today'] = ($today_result && $row = $today_result->fetch_assoc()) ? $row['today'] : 0;
+
+// Benzersiz IP sayısı
+$unique_ip_result = $conn->query("SELECT COUNT(DISTINCT ip_address) as unique_ips FROM verification_logs WHERE deleted_at IS NULL");
+$stats['unique_ips'] = ($unique_ip_result && $row = $unique_ip_result->fetch_assoc()) ? $row['unique_ips'] : 0;
+
 // Eser durumlarına göre doğrulama sayıları
 $status_result = $conn->query("
     SELECT a.status, COUNT(vl.id) as count 
@@ -32,9 +40,9 @@ $status_result = $conn->query("
 ");
 
 $stats['by_status'] = [
-    'original' => 0,
-    'for_sale' => 0,
-    'sold' => 0,
+    'satista' => 0,
+    'satildi' => 0,
+    'arsiv' => 0,
     'fake' => 0,
     'unknown' => 0
 ];
@@ -46,6 +54,41 @@ if ($status_result) {
         } else {
             $stats['by_status']['unknown'] += (int)$row['count'];
         }
+    }
+}
+
+// Platforma göre doğrulama sayıları
+$platform_result = $conn->query("
+    SELECT platform, COUNT(*) as count
+    FROM verification_logs
+    WHERE deleted_at IS NULL AND platform IS NOT NULL
+    GROUP BY platform
+    ORDER BY count DESC
+");
+
+$stats['by_platform'] = [];
+if ($platform_result) {
+    while ($row = $platform_result->fetch_assoc()) {
+        $platform = $row['platform'] ?: 'Bilinmiyor';
+        $stats['by_platform'][$platform] = (int)$row['count'];
+    }
+}
+
+// Tarayıcıya göre doğrulama sayıları
+$browser_result = $conn->query("
+    SELECT browser, COUNT(*) as count
+    FROM verification_logs
+    WHERE deleted_at IS NULL AND browser IS NOT NULL
+    GROUP BY browser
+    ORDER BY count DESC
+    LIMIT 5
+");
+
+$stats['by_browser'] = [];
+if ($browser_result) {
+    while ($row = $browser_result->fetch_assoc()) {
+        $browser = $row['browser'] ?: 'Bilinmiyor';
+        $stats['by_browser'][$browser] = (int)$row['count'];
     }
 }
 
@@ -62,6 +105,24 @@ $stats['daily'] = [];
 if ($daily_result) {
     while ($row = $daily_result->fetch_assoc()) {
         $stats['daily'][$row['date']] = (int)$row['count'];
+    }
+}
+
+// En çok doğrulanan 5 eser
+$top_artworks_result = $conn->query("
+    SELECT a.id, a.title, a.artist_name, COUNT(vl.id) as verify_count
+    FROM verification_logs vl
+    JOIN artworks a ON vl.artwork_id = a.id
+    WHERE vl.deleted_at IS NULL
+    GROUP BY a.id
+    ORDER BY verify_count DESC
+    LIMIT 5
+");
+
+$stats['top_artworks'] = [];
+if ($top_artworks_result) {
+    while ($row = $top_artworks_result->fetch_assoc()) {
+        $stats['top_artworks'][] = $row;
     }
 }
 
@@ -97,6 +158,10 @@ $additional_css = '
 <style>
     .log-item {transition: background-color 0.3s;}
     .log-item:hover {background-color: #f8f9fa;}
+    .small-box .icon i {font-size: 50px; top: 10px;}
+    .stats-title {font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;}
+    .stats-value {font-size: 2rem; font-weight: 600;}
+    .browser-icon {font-size: 16px; margin-right: 5px;}
 </style>';
 
 // DataTables ve Chart.js için ek JS
@@ -139,6 +204,13 @@ $(document).ready(function() {
             plugins: {
                 legend: {
                     position: "top",
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + " doğrulama";
+                        }
+                    }
                 }
             }
         }
@@ -147,19 +219,19 @@ $(document).ready(function() {
     // Status chart
     var statusData = [
         {
-            label: "Orijinal",
-            value: '.$stats['by_status']['original'].',
-            color: "#28a745"
-        },
-        {
-            label: "Satılık",
-            value: '.$stats['by_status']['for_sale'].',
+            label: "Satışta",
+            value: '.$stats['by_status']['satista'].',
             color: "#17a2b8"
         },
         {
             label: "Satıldı",
-            value: '.$stats['by_status']['sold'].',
+            value: '.$stats['by_status']['satildi'].',
             color: "#ffc107"
+        },
+        {
+            label: "Arşiv",
+            value: '.$stats['by_status']['arsiv'].',
+            color: "#6c757d"
         },
         {
             label: "Sahte",
@@ -169,7 +241,7 @@ $(document).ready(function() {
         {
             label: "Bilinmiyor",
             value: '.$stats['by_status']['unknown'].',
-            color: "#6c757d"
+            color: "#28a745"
         }
     ];
     
@@ -180,6 +252,77 @@ $(document).ready(function() {
             datasets: [{
                 data: statusData.map(item => item.value),
                 backgroundColor: statusData.map(item => item.color),
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "right",
+                }
+            }
+        }
+    });
+    
+    // Platform chart
+    var platformData = '.json_encode($stats['by_platform']).';
+    var platformLabels = Object.keys(platformData);
+    var platformValues = Object.values(platformData);
+    
+    new Chart(document.getElementById("platform-chart"), {
+        type: "bar",
+        data: {
+            labels: platformLabels,
+            datasets: [{
+                label: "Doğrulama Sayısı",
+                data: platformValues,
+                backgroundColor: [
+                    "rgba(54, 162, 235, 0.7)",
+                    "rgba(255, 99, 132, 0.7)",
+                    "rgba(255, 206, 86, 0.7)",
+                    "rgba(75, 192, 192, 0.7)",
+                    "rgba(153, 102, 255, 0.7)"
+                ],
+                borderColor: [
+                    "rgba(54, 162, 235, 1)",
+                    "rgba(255, 99, 132, 1)",
+                    "rgba(255, 206, 86, 1)",
+                    "rgba(75, 192, 192, 1)",
+                    "rgba(153, 102, 255, 1)"
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: "y",
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Browser chart
+    var browserData = '.json_encode($stats['by_browser']).';
+    var browserLabels = Object.keys(browserData);
+    var browserValues = Object.values(browserData);
+    
+    new Chart(document.getElementById("browser-chart"), {
+        type: "pie",
+        data: {
+            labels: browserLabels,
+            datasets: [{
+                data: browserValues,
+                backgroundColor: [
+                    "#FF6384",
+                    "#36A2EB",
+                    "#FFCE56",
+                    "#4BC0C0",
+                    "#9966FF"
+                ],
                 hoverOffset: 4
             }]
         },
@@ -218,24 +361,11 @@ include 'templates/header.php';
         <!-- small box -->
         <div class="small-box bg-success">
             <div class="inner">
-                <h3><?php echo $stats['by_status']['original'] + $stats['by_status']['for_sale'] + $stats['by_status']['sold']; ?></h3>
-                <p>Orijinal Eser Doğrulaması</p>
+                <h3><?php echo $stats['today']; ?></h3>
+                <p>Bugünkü Doğrulama</p>
             </div>
             <div class="icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-        </div>
-    </div>
-    <!-- ./col -->
-    <div class="col-lg-3 col-6">
-        <!-- small box -->
-        <div class="small-box bg-danger">
-            <div class="inner">
-                <h3><?php echo $stats['by_status']['fake']; ?></h3>
-                <p>Sahte Eser Doğrulaması</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-times-circle"></i>
+                <i class="fas fa-calendar-day"></i>
             </div>
         </div>
     </div>
@@ -244,11 +374,24 @@ include 'templates/header.php';
         <!-- small box -->
         <div class="small-box bg-warning">
             <div class="inner">
-                <h3><?php echo $stats['by_status']['unknown']; ?></h3>
-                <p>Bilinmeyen Eser Doğrulaması</p>
+                <h3><?php echo $stats['unique_ips']; ?></h3>
+                <p>Benzersiz IP Adresi</p>
             </div>
             <div class="icon">
-                <i class="fas fa-question-circle"></i>
+                <i class="fas fa-network-wired"></i>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3><?php echo count($logs); ?></h3>
+                <p>Kayıtlı Doğrulama</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-database"></i>
             </div>
         </div>
     </div>
@@ -280,8 +423,68 @@ include 'templates/header.php';
     </div>
 </div>
 
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Platform Dağılımı</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="platform-chart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Tarayıcı Dağılımı</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="browser-chart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- En Çok Doğrulanan Eserler -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">En Çok Doğrulanan Eserler</h3>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="width: 10px">#</th>
+                        <th>Eser Adı</th>
+                        <th>Sanatçı</th>
+                        <th style="width: 20%">Doğrulama Sayısı</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($stats['top_artworks'] as $index => $artwork): ?>
+                    <tr>
+                        <td><?php echo $index + 1; ?></td>
+                        <td><a href="artwork_view.php?id=<?php echo $artwork['id']; ?>"><?php echo htmlspecialchars($artwork['title']); ?></a></td>
+                        <td><?php echo htmlspecialchars($artwork['artist_name']); ?></td>
+                        <td>
+                            <div class="progress progress-xs">
+                                <div class="progress-bar bg-success" style="width: <?php echo min(100, ($artwork['verify_count'] / max(1, $stats['total'])) * 100); ?>%"></div>
+                            </div>
+                            <span class="badge bg-success"><?php echo $artwork['verify_count']; ?></span>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <!-- Doğrulama Kayıtları Tablosu -->
-<div class="card">
+<div class="card mt-4">
     <div class="card-header">
         <h3 class="card-title">Tüm Doğrulama Kayıtları</h3>
     </div>
@@ -293,7 +496,7 @@ include 'templates/header.php';
                     <th>Tarih</th>
                     <th>Eser</th>
                     <th>IP Adresi</th>
-                    <th>Tarayıcı</th>
+                    <th>Cihaz / Tarayıcı</th>
                     <th>Durum</th>
                 </tr>
             </thead>
@@ -304,25 +507,62 @@ include 'templates/header.php';
                     <td><?php echo date('d.m.Y H:i', strtotime($log['created_at'])); ?></td>
                     <td>
                         <?php if ($log['artwork_id'] && $log['artwork_title']): ?>
-                            <strong><?php echo htmlspecialchars($log['artwork_title']); ?></strong>
+                            <a href="artwork_view.php?id=<?php echo $log['artwork_id']; ?>">
+                                <strong><?php echo htmlspecialchars($log['artwork_title']); ?></strong>
+                            </a>
                             <br><small><?php echo htmlspecialchars($log['artist_name']); ?></small>
                         <?php else: ?>
                             <span class="text-muted">Eser bulunamadı (ID: <?php echo htmlspecialchars($log['artwork_id'] ?? 'N/A'); ?>)</span>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
-                    <td><?php echo htmlspecialchars($log['user_agent']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($log['ip_address']); ?>
+                        <?php if (!empty($log['ip_address'])): ?>
+                            <a href="https://whatismyipaddress.com/ip/<?php echo htmlspecialchars($log['ip_address']); ?>" target="_blank" class="ml-1" title="IP Bilgisi">
+                                <i class="fas fa-info-circle"></i>
+                            </a>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($log['device_type'])): ?>
+                            <span class="badge badge-primary"><?php echo htmlspecialchars($log['device_type']); ?></span>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($log['platform'])): ?>
+                            <span class="badge badge-secondary"><?php echo htmlspecialchars($log['platform']); ?></span>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($log['browser'])): ?>
+                            <span class="badge badge-info">
+                                <?php 
+                                $browser_icon = 'fas fa-globe';
+                                if (stripos($log['browser'], 'chrome') !== false) $browser_icon = 'fab fa-chrome';
+                                elseif (stripos($log['browser'], 'firefox') !== false) $browser_icon = 'fab fa-firefox';
+                                elseif (stripos($log['browser'], 'safari') !== false) $browser_icon = 'fab fa-safari';
+                                elseif (stripos($log['browser'], 'edge') !== false) $browser_icon = 'fab fa-edge';
+                                elseif (stripos($log['browser'], 'opera') !== false) $browser_icon = 'fab fa-opera';
+                                elseif (stripos($log['browser'], 'ie') !== false) $browser_icon = 'fab fa-internet-explorer';
+                                ?>
+                                <i class="<?php echo $browser_icon; ?> browser-icon"></i>
+                                <?php echo htmlspecialchars($log['browser']); ?>
+                            </span>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if ($log['artwork_id'] && $log['status']): ?>
-                            <?php if ($log['status'] == 'original' || $log['status'] == 'for_sale' || $log['status'] == 'sold'): ?>
-                                <span class="badge badge-success">Orijinal</span>
+                            <?php if ($log['status'] == 'satista'): ?>
+                                <span class="badge badge-info">Satışta</span>
+                            <?php elseif ($log['status'] == 'satildi'): ?>
+                                <span class="badge badge-warning">Satıldı</span>
+                            <?php elseif ($log['status'] == 'arsiv'): ?>
+                                <span class="badge badge-secondary">Arşivde</span>
                             <?php elseif ($log['status'] == 'fake'): ?>
                                 <span class="badge badge-danger">Sahte</span>
                             <?php else: ?>
-                                <span class="badge badge-secondary">Bilinmiyor</span>
+                                <span class="badge badge-success">Bilinmiyor</span>
                             <?php endif; ?>
                         <?php else: ?>
-                            <span class="badge badge-warning">Belirsiz</span>
+                            <span class="badge badge-secondary">Belirsiz</span>
                         <?php endif; ?>
                     </td>
                 </tr>

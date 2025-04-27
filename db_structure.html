@@ -1,0 +1,25 @@
+ <h2>Artworks Tablosu Yapısı:</h2><table border='1' cellpadding='5'><tr><th>Alan</th><th>Tip</th><th>Null</th><th>Anahtar</th><th>Varsayılan</th><th>Ekstra</th></tr><tr><td>id</td><td>bigint unsigned</td><td>NO</td><td>PRI</td><td></td><td>auto_increment</td></tr><tr><td>title</td><td>varchar(255)</td><td>NO</td><td></td><td></td><td></td></tr><tr><td>description</td><td>text</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>image_path</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>location</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>technique</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>edition_number</td><td>varchar(20)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>edition_type</td><td>varchar(50)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>status</td><td>enum('original','for_sale','sold','fake','archived')</td><td>NO</td><td></td><td>original</td><td></td></tr><tr><td>dimensions</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>price</td><td>decimal(10,2)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>country</td><td>varchar(50)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>verification_code</td><td>varchar(50)</td><td>NO</td><td>UNI</td><td></td><td></td></tr><tr><td>is_verified</td><td>tinyint(1)</td><td>NO</td><td></td><td>0</td><td></td></tr><tr><td>artist_name</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>first_owner</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>print_date</td><td>date</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>size</td><td>varchar(255)</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>created_at</td><td>timestamp</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>updated_at</td><td>timestamp</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>deleted_at</td><td>timestamp</td><td>YES</td><td></td><td></td><td></td></tr><tr><td>edition_id</td><td>int</td><td>YES</td><td>MUL</td><td></td><td></td></tr></table><h2>Artworks Tablosu Status Sütunu Collation:</h2><pre>Array
+(
+    [Field] => status
+    [Type] => enum('original','for_sale','sold','fake','archived')
+    [Collation] => utf8mb4_unicode_ci
+    [Null] => NO
+    [Key] => 
+    [Default] => original
+    [Extra] => 
+    [Privileges] => select,insert,update,references
+    [Comment] => 
+)
+</pre><h2>Artworks Tablosundaki Status Değerleri:</h2><ul><li>original</li><li>for_sale</li></ul><h2>Artwork_statuses Tablosu Yapısı:</h2><table border='1' cellpadding='5'><tr><th>Alan</th><th>Tip</th><th>Null</th><th>Anahtar</th><th>Varsayılan</th><th>Ekstra</th></tr><tr><td>id</td><td>int</td><td>NO</td><td>PRI</td><td></td><td>auto_increment</td></tr><tr><td>status_key</td><td>varchar(50)</td><td>NO</td><td>UNI</td><td></td><td></td></tr><tr><td>status_name</td><td>varchar(100)</td><td>NO</td><td></td><td></td><td></td></tr><tr><td>is_active</td><td>tinyint(1)</td><td>YES</td><td></td><td>1</td><td></td></tr><tr><td>created_at</td><td>timestamp</td><td>YES</td><td></td><td>CURRENT_TIMESTAMP</td><td>DEFAULT_GENERATED</td></tr><tr><td>updated_at</td><td>timestamp</td><td>YES</td><td></td><td>CURRENT_TIMESTAMP</td><td>DEFAULT_GENERATED on update CURRENT_TIMESTAMP</td></tr></table><h2>Artwork_statuses Tablosu Status_key Sütunu Collation:</h2><pre>Array
+(
+    [Field] => status_key
+    [Type] => varchar(50)
+    [Collation] => utf8mb4_0900_ai_ci
+    [Null] => NO
+    [Key] => UNI
+    [Default] => 
+    [Extra] => 
+    [Privileges] => select,insert,update,references
+    [Comment] => 
+)
+</pre><h2>Artwork_statuses Tablosu Verileri:</h2><table border='1' cellpadding='5'><tr><th>ID</th><th>Status Key</th><th>Status Name</th><th>Is Active</th><th>Created At</th><th>Updated At</th></tr><tr><td>6</td><td>arsiv</td><td>Arşiv</td><td>1</td><td>2025-04-27 13:53:37</td><td>2025-04-27 13:53:37</td></tr><tr><td>7</td><td>satildi</td><td>Satıldı</td><td>1</td><td>2025-04-27 13:53:44</td><td>2025-04-27 13:53:44</td></tr><tr><td>8</td><td>satista</td><td>Satışta</td><td>1</td><td>2025-04-27 13:53:54</td><td>2025-04-27 13:53:54</td></tr></table> 

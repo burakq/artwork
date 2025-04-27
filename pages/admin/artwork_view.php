@@ -68,6 +68,9 @@ if ($result && $result->num_rows > 0) {
 
 // Bağlantıyı kapat
 $conn->close();
+
+// Verify.php sayfasına yönlendir
+redirect('../../verify.php?code=' . $artwork['verification_code']);
 ?>
 <!DOCTYPE html>
 <html lang="tr">

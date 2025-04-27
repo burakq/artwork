@@ -87,7 +87,6 @@ try {
     // Önemli dosyaları zorunlu olarak ekle
     $requiredFiles = [
         'version.txt',
-        'config/db.php',
         'includes/functions.php',
         'pages/admin/templates/header.php',
         'pages/admin/templates/footer.php',
@@ -115,6 +114,11 @@ try {
     ]);
 
     foreach ($files as $localPath => $remoteUrl) {
+        // db.php dosyasını atla
+        if ($localPath === 'config/db.php') {
+            continue;
+        }
+        
         $content = @file_get_contents($remoteUrl, false, $context);
         if ($content !== false) {
             // Dosyayı yaz

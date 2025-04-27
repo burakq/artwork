@@ -32,6 +32,17 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// Hiç durum yoksa varsayılan değerleri ekle
+if (empty($statuses)) {
+    $statuses = [
+        'original' => 'Orijinal',
+        'for_sale' => 'Satışta',
+        'sold' => 'Satıldı',
+        'archived' => 'Arşivlendi',
+        'fake' => 'Sahte'
+    ];
+}
+
 // Teknikleri getir
 $techniques = [];
 $query = "SELECT * FROM artwork_techniques WHERE is_active = 1 ORDER BY technique_name";
@@ -67,29 +78,49 @@ if ($result && $result->num_rows > 0) {
 
 // Form gönderildi mi kontrol et
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Hata kontrolü için değişken
+    $error = null;
+    
     // Form verilerini al
     $title = sanitize($_POST['title']);
     $artist_name = sanitize($_POST['artist_name']);
     $description = sanitize($_POST['description']);
     $location = sanitize($_POST['location']);
-    $year = filter_var($_POST['year'], FILTER_VALIDATE_INT);
+    $print_date = sanitize($_POST['print_date']);
+    
+    // Tarih formatını değiştir (DD.MM.YYYY -> YYYY-MM-DD)
+    if (!empty($print_date)) {
+        $date_parts = explode('.', $print_date);
+        if (count($date_parts) === 3) {
+            $print_date = $date_parts[2] . '-' . $date_parts[1] . '-' . $date_parts[0];
+        } else {
+            // Geçersiz tarih formatı
+            $print_date = null;
+        }
+    } else {
+        $print_date = null;
+    }
+    
     $technique = sanitize($_POST['technique']);
-    $status = sanitize($_POST['status']);
+    $status = sanitize($_POST['status']); // Formdan gelen status_key değeri artık doğrudan kullanılabilir
+    
+    error_log("Ekleme formundan gelen status değeri: $status");
+    
     $edition_type = sanitize($_POST['edition_type']);
     $edition_number = sanitize($_POST['edition_number']);
     $first_owner = sanitize($_POST['first_owner']);
     $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
-    $width = filter_var($_POST['width'], FILTER_VALIDATE_FLOAT);
-    $height = filter_var($_POST['height'], FILTER_VALIDATE_FLOAT);
-    $depth = filter_var($_POST['depth'], FILTER_VALIDATE_FLOAT);
-    $dimension_unit = sanitize($_POST['dimension_unit']);
+    $dimensions = sanitize($_POST['dimensions']);
     
     // Doğrulama kodu oluştur - 12 hane
     $verification_code = generateVerificationCode();
     
-    // Resim yükleme işlemi
-    $image_path = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+    // Resim yükleme kontrolü
+    if (!isset($_FILES['image']) || $_FILES['image']['error'] != 0) {
+        $error = 'Lütfen bir eser görseli yükleyin.';
+    } else {
+        // Resim yükleme işlemi
+        $image_path = '';
         // Dosya adını düzenle - eser adı ve sanatçı adı kullanarak
         $fileExt = pathinfo(basename($_FILES['image']['name']), PATHINFO_EXTENSION);
         $sanitizedTitle = preg_replace('/[^a-z0-9]+/', '-', strtolower($title));
@@ -113,27 +144,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // Veritabanına kaydet
-    $sql = "INSERT INTO artworks (title, artist_name, description, image_path, location, year, 
-            technique, status, edition_type, edition_number, first_owner, price, verification_code, 
-            width, height, depth, dimension_unit, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
-    
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssisssssdsdddss", 
-        $title, $artist_name, $description, $image_path, $location, $year, 
-        $technique, $status, $edition_type, $edition_number, $first_owner, $price, 
-        $verification_code, $width, $height, $depth, $dimension_unit);
-    
-    if ($stmt->execute()) {
-        // Başarıyla eklendi
-        redirect('artworks.php?success=1');
-    } else {
-        // Hata oluştu
-        $error = "Eser eklenirken bir hata oluştu: " . $conn->error;
+    // Hata yoksa veritabanına kaydet
+    if (!$error) {
+        // Veritabanına kaydet
+        $sql = "INSERT INTO artworks (title, artist_name, description, image_path, location, print_date, 
+                technique, status, edition_type, edition_number, first_owner, price, verification_code, 
+                dimensions, created_at, updated_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssssssssssdss", 
+            $title, $artist_name, $description, $image_path, $location, $print_date, 
+            $technique, $status, $edition_type, $edition_number, $first_owner, $price, 
+            $verification_code, $dimensions);
+        
+        if ($stmt->execute()) {
+            // Başarıyla eklendi
+            redirect('artworks.php?success=1');
+        } else {
+            // Hata oluştu
+            $error = "Eser eklenirken bir hata oluştu: " . $conn->error;
+        }
+        
+        $stmt->close();
     }
-    
-    $stmt->close();
 }
 
 // Bağlantıyı kapat
@@ -167,6 +201,21 @@ function generateVerificationCode() {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
+    <!-- Tempus Dominus Bootstrap 4 Date/Time Picker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css">
+    <style>
+        #imagePreviewContainer {
+            max-width: 300px;
+            margin: 10px 0;
+            display: none;
+        }
+        #imagePreview {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -271,13 +320,17 @@ function generateVerificationCode() {
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="image" class="required">Eser Görseli</label>
+                                        <label for="image">Eser Görseli</label>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input type="file" class="custom-file-input" id="image" name="image" required>
-                                                <label class="custom-file-label" for="image">Dosya seçin</label>
+                                                <input type="file" class="custom-file-input" id="image" name="image" accept="image/*" required>
+                                                <label class="custom-file-label" for="image">Dosya Seçin</label>
                                             </div>
                                         </div>
+                                        <div id="imagePreviewContainer">
+                                            <img id="imagePreview" src="#" alt="Görsel Önizleme">
+                                        </div>
+                                        <small class="form-text text-muted">Desteklenen formatlar: JPG, JPEG, PNG, GIF</small>
                                     </div>
 
                                     <div class="row">
@@ -294,8 +347,14 @@ function generateVerificationCode() {
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="year">Yıl</label>
-                                                <input type="number" class="form-control" id="year" name="year" min="1" max="<?php echo date('Y'); ?>">
+                                                <label for="print_date">Baskı Tarihi</label>
+                                                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" id="print_date" name="print_date" placeholder="GG.AA.YYYY">
+                                                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                                <small class="form-text text-muted">Tarih formatı: GG.AA.YYYY</small>
                                             </div>
                                         </div>
                                     </div>
@@ -358,33 +417,10 @@ function generateVerificationCode() {
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="width">Genişlik</label>
-                                                <input type="number" class="form-control" id="width" name="width" min="0" step="0.01">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="height">Yükseklik</label>
-                                                <input type="number" class="form-control" id="height" name="height" min="0" step="0.01">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="depth">Derinlik</label>
-                                                <input type="number" class="form-control" id="depth" name="depth" min="0" step="0.01">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="dimension_unit">Boyut Birimi</label>
-                                                <select class="form-control" id="dimension_unit" name="dimension_unit">
-                                                    <option value="cm">cm</option>
-                                                    <option value="mm">mm</option>
-                                                    <option value="m">m</option>
-                                                    <option value="inch">inç</option>
-                                                </select>
+                                                <label for="dimensions">Boyut</label>
+                                                <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="Örn: 105x105 cm">
                                             </div>
                                         </div>
                                     </div>
@@ -424,9 +460,70 @@ function generateVerificationCode() {
 <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input@1.3.4/dist/bs-custom-file-input.min.js"></script>
 <!-- AdminLTE 3 App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/tr.js"></script>
+<!-- Tempus Dominus Bootstrap 4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
 <script>
 $(function () {
     bsCustomFileInput.init();
+    
+    // Tarih seçici
+    $('#datetimepicker1').datetimepicker({
+        format: 'DD.MM.YYYY',
+        locale: 'tr',
+        icons: {
+            time: 'far fa-clock',
+            date: 'far fa-calendar',
+            up: 'fas fa-arrow-up',
+            down: 'fas fa-arrow-down',
+            previous: 'fas fa-chevron-left',
+            next: 'fas fa-chevron-right',
+            today: 'fas fa-calendar-check',
+            clear: 'far fa-trash-alt',
+            close: 'far fa-times-circle'
+        }
+    });
+});
+
+document.getElementById('image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Dosya boyutu kontrolü (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Dosya boyutu 10MB\'dan küçük olmalıdır.');
+            this.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const preview = document.getElementById('imagePreview');
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+
+        reader.readAsDataURL(file);
+
+        // Dosya adını input label'ına yaz
+        const fileName = file.name;
+        const label = e.target.nextElementSibling;
+        label.textContent = fileName;
+    }
+});
+
+// Form gönderilmeden önce kontrol
+document.querySelector('form').addEventListener('submit', function(e) {
+    const imageInput = document.getElementById('image');
+    if (!imageInput.files || !imageInput.files[0]) {
+        e.preventDefault();
+        alert('Lütfen bir görsel seçin.');
+        return false;
+    }
 });
 </script>
 </body>

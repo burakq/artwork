@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $id = (int)$_POST['id'];
             
             // Durumun kullanımda olup olmadığını kontrol et
-            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM artworks WHERE status = (SELECT status_key FROM artwork_statuses WHERE id = ?)");
+            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM artworks WHERE status = (SELECT status_key FROM artwork_statuses WHERE id = ? COLLATE utf8mb4_unicode_ci)");
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();

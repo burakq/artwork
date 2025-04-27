@@ -109,30 +109,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
-        <li class="nav-item <?php echo in_array($current_page, ['nfc.php', 'nfc_add.php', 'nfc_edit.php']) ? 'menu-open' : ''; ?>">
-            <a href="#" class="nav-link <?php echo in_array($current_page, ['nfc.php', 'nfc_add.php', 'nfc_edit.php']) ? 'active' : ''; ?>">
-                <i class="nav-icon fas fa-id-card"></i>
-                <p>
-                    NFC Yönetimi
-                    <i class="fas fa-angle-left right"></i>
-                </p>
-            </a>
-            <ul class="nav nav-treeview">
-                <li class="nav-item">
-                    <a href="nfc.php" class="nav-link <?php echo $current_page == 'nfc.php' ? 'active' : ''; ?>">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>NFC Listesi</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="nfc_add.php" class="nav-link <?php echo $current_page == 'nfc_add.php' ? 'active' : ''; ?>">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Yeni NFC Ekle</p>
-                    </a>
-                </li>
-            </ul>
-        </li>
-        
         <li class="nav-item <?php echo in_array($current_page, ['users.php', 'user_add.php', 'user_edit.php']) ? 'menu-open' : ''; ?>">
             <a href="#" class="nav-link <?php echo in_array($current_page, ['users.php', 'user_add.php', 'user_edit.php']) ? 'active' : ''; ?>">
                 <i class="nav-icon fas fa-user-shield"></i>
@@ -155,6 +131,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
             </ul>
+        </li>
+        
+        <li class="nav-item">
+            <a href="certificate_design.php" class="nav-link <?php echo $current_page == 'certificate_design.php' ? 'active' : ''; ?>">
+                <i class="nav-icon fas fa-certificate"></i>
+                <p>Sertifika Tasarımı</p>
+            </a>
         </li>
         
         <li class="nav-item">

@@ -27,6 +27,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $site_title = isset($_POST['site_title']) ? sanitize($_POST['site_title']) : '';
     $site_description = isset($_POST['site_description']) ? sanitize($_POST['site_description']) : '';
     $allowed_iframe_domains = isset($_POST['allowed_iframe_domains']) ? sanitize($_POST['allowed_iframe_domains']) : '';
+    $site_url = isset($_POST['site_url']) ? sanitize($_POST['site_url']) : '';
+    
+    // Logo yükleme işlemi
+    if(isset($_FILES['site_logo']) && $_FILES['site_logo']['size'] > 0) {
+        $upload_dir = '../../uploads/logo/';
+        
+        // Klasör yoksa oluştur
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        $file_name = time() . '_' . basename($_FILES['site_logo']['name']);
+        $target_file = $upload_dir . $file_name;
+        
+        // Geçerli bir resim dosyası mı kontrol et
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if($imageFileType == "jpg" || $imageFileType == "png" || $imageFileType == "jpeg" || $imageFileType == "gif") {
+            if(move_uploaded_file($_FILES['site_logo']['tmp_name'], $target_file)) {
+                $logo_path = 'uploads/logo/' . $file_name;
+                
+                // Logo yolunu güncelle
+                $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = 'site_logo'");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $stmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'site_logo'");
+                    $stmt->bind_param("s", $logo_path);
+                } else {
+                    $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value, created_at, updated_at) VALUES ('site_logo', ?, NOW(), NOW())");
+                    $stmt->bind_param("s", $logo_path);
+                }
+                $stmt->execute();
+            } else {
+                $error_message = "Logo yüklenirken bir hata oluştu.";
+            }
+        } else {
+            $error_message = "Sadece JPG, JPEG, PNG ve GIF dosyaları yüklenebilir.";
+        }
+    }
+    
+    // Sertifika logosu yükleme işlemi
+    if(isset($_FILES['certificate_logo']) && $_FILES['certificate_logo']['size'] > 0) {
+        $upload_dir = '../../uploads/certificate/';
+        
+        // Klasör yoksa oluştur
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        $file_name = time() . '_' . basename($_FILES['certificate_logo']['name']);
+        $target_file = $upload_dir . $file_name;
+        
+        // Geçerli bir resim dosyası mı kontrol et
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if($imageFileType == "jpg" || $imageFileType == "png" || $imageFileType == "jpeg" || $imageFileType == "gif") {
+            if(move_uploaded_file($_FILES['certificate_logo']['tmp_name'], $target_file)) {
+                $logo_path = 'uploads/certificate/' . $file_name;
+                
+                // Logo yolunu güncelle
+                $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = 'certificate_logo'");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $stmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'certificate_logo'");
+                    $stmt->bind_param("s", $logo_path);
+                } else {
+                    $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value, created_at, updated_at) VALUES ('certificate_logo', ?, NOW(), NOW())");
+                    $stmt->bind_param("s", $logo_path);
+                }
+                $stmt->execute();
+            } else {
+                $error_message = "Sertifika logosu yüklenirken bir hata oluştu.";
+            }
+        } else {
+            $error_message = "Sadece JPG, JPEG, PNG ve GIF dosyaları yüklenebilir.";
+        }
+    }
     
     // WhatsApp numarasını güncelle
     $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = 'whatsapp_number'");
@@ -41,6 +120,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Ekle
         $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value, created_at, updated_at) VALUES ('whatsapp_number', ?, NOW(), NOW())");
         $stmt->bind_param("s", $whatsapp_number);
+    }
+    $stmt->execute();
+    
+    // Site URL'ini güncelle
+    $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = 'site_url'");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $stmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'site_url'");
+        $stmt->bind_param("s", $site_url);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value, created_at, updated_at) VALUES ('site_url', ?, NOW(), NOW())");
+        $stmt->bind_param("s", $site_url);
     }
     $stmt->execute();
     
@@ -86,6 +179,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmt->execute();
     
+    // Arka plan resmi yükleme işlemi
+    if(isset($_FILES['background_image']) && $_FILES['background_image']['size'] > 0) {
+        $upload_dir = '../../uploads/background/';
+        
+        // Klasör yoksa oluştur
+        if (!file_exists($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
+        
+        $file_name = time() . '_' . basename($_FILES['background_image']['name']);
+        $target_file = $upload_dir . $file_name;
+        
+        // Geçerli bir resim dosyası mı kontrol et
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        if($imageFileType == "jpg" || $imageFileType == "png" || $imageFileType == "jpeg" || $imageFileType == "gif") {
+            if(move_uploaded_file($_FILES['background_image']['tmp_name'], $target_file)) {
+                $background_path = 'uploads/background/' . $file_name;
+                
+                // Arka plan yolunu güncelle
+                $stmt = $conn->prepare("SELECT id FROM settings WHERE setting_key = 'background_image'");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $stmt = $conn->prepare("UPDATE settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = 'background_image'");
+                    $stmt->bind_param("s", $background_path);
+                } else {
+                    $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value, created_at, updated_at) VALUES ('background_image', ?, NOW(), NOW())");
+                    $stmt->bind_param("s", $background_path);
+                }
+                $stmt->execute();
+            } else {
+                $error_message = "Arka plan resmi yüklenirken bir hata oluştu.";
+            }
+        } else {
+            $error_message = "Sadece JPG, JPEG, PNG ve GIF dosyaları yüklenebilir.";
+        }
+    }
+    
     $success_message = "Ayarlar başarıyla güncellendi.";
 }
 
@@ -106,9 +238,13 @@ $whatsapp_number = isset($settings['whatsapp_number']) ? $settings['whatsapp_num
 $site_title = isset($settings['site_title']) ? $settings['site_title'] : 'Artwork Auth';
 $site_description = isset($settings['site_description']) ? $settings['site_description'] : 'Sanat eserlerinin orijinalliğini doğrulama ve satış platformu.';
 $allowed_iframe_domains = isset($settings['allowed_iframe_domains']) ? $settings['allowed_iframe_domains'] : '';
+$site_url = isset($settings['site_url']) ? $settings['site_url'] : (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+$site_logo = isset($settings['site_logo']) ? $settings['site_logo'] : '';
+$certificate_logo = isset($settings['certificate_logo']) ? $settings['certificate_logo'] : '';
+$background_image = isset($settings['background_image']) ? $settings['background_image'] : '';
 
 // Sunucu adresi
-$server_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+$server_url = empty($site_url) ? (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" : $site_url;
 
 // Bağlantıyı kapat
 $conn->close();
@@ -212,11 +348,16 @@ $conn->close();
                                 </div>
                                 <!-- /.card-header -->
                                 <!-- form start -->
-                                <form method="post" action="">
+                                <form method="post" action="" enctype="multipart/form-data">
                                     <div class="card-body">
                                         <div class="form-group">
                                             <label for="whatsapp_number">WhatsApp Numarası <small>(Uluslararası formatta, örn: 905301234567)</small></label>
                                             <input type="text" class="form-control" id="whatsapp_number" name="whatsapp_number" value="<?php echo htmlspecialchars($whatsapp_number); ?>" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="site_url">Site URL <small>(https://ornek.com şeklinde, sonunda / olmadan)</small></label>
+                                            <input type="text" class="form-control" id="site_url" name="site_url" value="<?php echo htmlspecialchars($site_url); ?>" placeholder="https://www.siteadresi.com">
+                                            <small class="form-text text-muted">Site URL'ini değiştirirseniz, QR kodları ve diğer bağlantılar bu URL'yi kullanarak oluşturulacaktır. Boş bırakırsanız mevcut sunucu adresi kullanılır.</small>
                                         </div>
                                         <div class="form-group">
                                             <label for="site_title">Site Başlığı</label>
@@ -230,6 +371,51 @@ $conn->close();
                                             <label for="allowed_iframe_domains">İzin Verilen iframe Domainleri <small>(Her satıra bir domain)</small></label>
                                             <textarea class="form-control" id="allowed_iframe_domains" name="allowed_iframe_domains" rows="4" placeholder="example.com&#10;sub.example.com"><?php echo htmlspecialchars($allowed_iframe_domains); ?></textarea>
                                             <small class="form-text text-muted">Siteyi iframe olarak gösterebilecek domain adlarını yazın. Boş bırakırsanız hiçbir site iframe olarak gösteremez.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="site_logo">Site Logosu</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="site_logo" name="site_logo" accept="image/*">
+                                                    <label class="custom-file-label" for="site_logo">Dosya seçin</label>
+                                                </div>
+                                            </div>
+                                            <?php if (!empty($site_logo)): ?>
+                                            <div class="mt-2">
+                                                <img src="../../<?php echo $site_logo; ?>" alt="Site Logosu" style="max-width: 200px; max-height: 100px;">
+                                            </div>
+                                            <?php endif; ?>
+                                            <small class="form-text text-muted">Ana site logosu için kullanılacak görsel.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="certificate_logo">Sertifika Logosu</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="certificate_logo" name="certificate_logo" accept="image/*">
+                                                    <label class="custom-file-label" for="certificate_logo">Dosya seçin</label>
+                                                </div>
+                                            </div>
+                                            <?php if (!empty($certificate_logo)): ?>
+                                            <div class="mt-2">
+                                                <img src="../../<?php echo $certificate_logo; ?>" alt="Sertifika Logosu" style="max-width: 200px; max-height: 100px;">
+                                            </div>
+                                            <?php endif; ?>
+                                            <small class="form-text text-muted">Sertifikalarda görüntülenecek logo.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="background_image">Site Arka Plan Resmi</label>
+                                            <div class="input-group">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="background_image" name="background_image" accept="image/*">
+                                                    <label class="custom-file-label" for="background_image">Dosya seçin</label>
+                                                </div>
+                                            </div>
+                                            <?php if (!empty($background_image)): ?>
+                                            <div class="mt-2">
+                                                <img src="../../<?php echo $background_image; ?>" alt="Arka Plan Resmi" style="max-width: 200px; max-height: 100px;">
+                                            </div>
+                                            <?php endif; ?>
+                                            <small class="form-text text-muted">Doğrulama sayfası arka plan resmi olarak kullanılacak görsel. Desen veya hafif dokulu bir görsel tavsiye edilir.</small>
                                         </div>
                                     </div>
                                     <!-- /.card-body -->
@@ -357,14 +543,16 @@ $conn->close();
     <script src="../../assets/js/script.js"></script>
     <!-- Add custom script for copying to clipboard -->
     <script>
-        function copyToClipboard(elementId) {
-            var copyText = document.getElementById(elementId);
-            copyText.select();
-            document.execCommand("copy");
-            alert("Kod panoya kopyalandı!");
-        }
-        
         $(document).ready(function() {
+            bsCustomFileInput.init();
+            
+            function copyToClipboard(elementId) {
+                var copyText = document.getElementById(elementId);
+                copyText.select();
+                document.execCommand("copy");
+                alert("Kod panoya kopyalandı!");
+            }
+            
             // Pushmenu toggle
             $("[data-widget='pushmenu']").on('click', function() {
                 $('body').toggleClass('sidebar-collapse');

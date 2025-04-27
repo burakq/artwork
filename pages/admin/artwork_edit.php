@@ -43,6 +43,9 @@ if ($result->num_rows === 0) {
 
 $artwork = $result->fetch_assoc();
 
+// Boyut bilgisini birleştir
+$artwork['dimensions'] = $artwork['dimensions'] . ' ' . $artwork['size'];
+
 // NULL değerler için varsayılan değerler ata
 $artwork['edition_number'] = $artwork['edition_number'] ?? '';
 $artwork['first_owner'] = $artwork['first_owner'] ?? '';
@@ -56,6 +59,9 @@ $artwork['technique'] = $artwork['technique'] ?? '';
 $artwork['status'] = $artwork['status'] ?? 'original';
 $artwork['location'] = $artwork['location'] ?? '';
 $artwork['description'] = $artwork['description'] ?? '';
+
+// Status değerini debug için
+error_log("Mevcut durum (DB'den alınan): " . $artwork['status']);
 
 $stmt->close();
 
@@ -98,6 +104,17 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
+// Hiç durum yoksa varsayılan değerleri ekle
+if (empty($statuses)) {
+    $statuses = [
+        'original' => 'Orijinal',
+        'for_sale' => 'Satışta',
+        'sold' => 'Satıldı',
+        'archived' => 'Arşivlendi',
+        'fake' => 'Sahte'
+    ];
+}
+
 // Konumları getir
 $locations = [];
 $query = "SELECT * FROM artwork_locations WHERE is_active = 1 ORDER BY location_name";
@@ -116,31 +133,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $artist_name = sanitize($_POST['artist_name']);
     $description = sanitize($_POST['description']);
     $location = sanitize($_POST['location']);
-    $year = filter_var($_POST['year'], FILTER_VALIDATE_INT);
+    $print_date = sanitize($_POST['print_date']);
+    
+    // Tarih formatını değiştir (DD.MM.YYYY -> YYYY-MM-DD)
+    if (!empty($print_date)) {
+        $date_parts = explode('.', $print_date);
+        if (count($date_parts) === 3) {
+            $print_date = $date_parts[2] . '-' . $date_parts[1] . '-' . $date_parts[0];
+        } else {
+            // Geçersiz tarih formatı
+            $print_date = null;
+        }
+    } else {
+        $print_date = null;
+    }
+    
     $technique = sanitize($_POST['technique']);
-    $status = sanitize($_POST['status']);
+    $status = sanitize($_POST['status']); // Formdan gelen status_key değeri doğrudan kullanılacak
     $edition_type = sanitize($_POST['edition_type']);
     $edition_number = sanitize($_POST['edition_number']);
     $first_owner = sanitize($_POST['first_owner']);
     $price = filter_var($_POST['price'], FILTER_VALIDATE_FLOAT);
-    $width = filter_var($_POST['width'], FILTER_VALIDATE_FLOAT);
-    $height = filter_var($_POST['height'], FILTER_VALIDATE_FLOAT);
-    $depth = filter_var($_POST['depth'], FILTER_VALIDATE_FLOAT);
-    $dimension_unit = sanitize($_POST['dimension_unit']);
+    $dimensions = sanitize($_POST['dimensions']);
     
-    // Durum kontrolü - ENUM olduğu için sadece izin verilen değerler kabul edilecek
-    $allowed_statuses = array('original', 'for_sale', 'sold', 'fake', 'archived');
-    $status = trim($_POST['status']); // Önce trim yapalım
-    
-    // Debug için
-    error_log("Gelen durum değeri: " . $status);
-    
-    // Sadece izin verilen değerlerden biri ise kullan
-    if (!in_array($status, $allowed_statuses)) {
-        $status = 'original'; // Eğer izin verilen değerlerden biri değilse varsayılan olarak 'original' kullan
-    }
-    
-    error_log("Kullanılacak durum değeri: " . $status);
+    error_log("Düzenleme formundan gelen status değeri: $status");
     
     // Resim yükleme işlemi
     $image_path = $artwork['image_path']; // Mevcut resim yolunu koru
@@ -173,43 +189,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
     
-    // Veritabanını güncelle
+    // Veritabanını güncelle (status dahil tüm alanlar)
     $sql = "UPDATE artworks SET 
             title = ?, 
             artist_name = ?, 
             description = ?, 
             image_path = ?, 
             location = ?, 
-            year = ?, 
+            print_date = ?, 
             technique = ?, 
             status = ?,
             edition_type = ?,
             edition_number = ?,
             first_owner = ?,
             price = ?, 
-            width = ?, 
-            height = ?, 
-            depth = ?, 
-            dimension_unit = ?, 
+            dimensions = ?, 
             updated_at = NOW() 
             WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssisssssddddssi", 
-        $title, $artist_name, $description, $image_path, $location, $year, 
+    
+    // Hata ayıklama için
+    error_log("SQL: " . $sql);
+    
+    // bind_param - sssssssssssds + i (14 parametre)
+    $stmt->bind_param("sssssssssssdsi", 
+        $title, $artist_name, $description, $image_path, $location, $print_date, 
         $technique, $status, $edition_type, $edition_number, $first_owner, $price, 
-        $width, $height, $depth, $dimension_unit, $id);
+        $dimensions, $id);
     
     if ($stmt->execute()) {
-        // Status değerini ayrı bir sorguda güncelleyelim
-        if (in_array($status, $allowed_statuses)) {
-            $status_sql = "UPDATE artworks SET status = ? WHERE id = ?";
-            $status_stmt = $conn->prepare($status_sql);
-            $status_stmt->bind_param("si", $status, $id);
-            $status_stmt->execute();
-            $status_stmt->close();
-        }
-        
         // Başarıyla güncellendi
         $message = "Eser başarıyla güncellendi.";
         $message_type = "success";
@@ -247,6 +256,8 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Custom CSS -->
     <link href="../../assets/css/style.css" rel="stylesheet">
+    <!-- Tempus Dominus Bootstrap 4 Date/Time Picker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css">
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -283,13 +294,6 @@ $conn->close();
 
         <!-- Sidebar -->
         <div class="sidebar">
-            <!-- Sidebar user panel (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block"><?php echo isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Admin'; ?></a>
-                </div>
-            </div>
-
             <?php include 'sidebar_menu.php'; ?>
         </div>
         <!-- /.sidebar -->
@@ -372,8 +376,14 @@ $conn->close();
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="year">Yapım Yılı</label>
-                                                <input type="number" class="form-control" id="year" name="year" value="<?php echo $artwork['year']; ?>">
+                                                <label for="print_date">Baskı Tarihi</label>
+                                                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" id="print_date" name="print_date" value="<?php echo !empty($artwork['print_date']) ? date('d.m.Y', strtotime($artwork['print_date'])) : ''; ?>" placeholder="GG.AA.YYYY">
+                                                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                    </div>
+                                                </div>
+                                                <small class="form-text text-muted">Tarih formatı: GG.AA.YYYY</small>
                                             </div>
                                         </div>
                                     </div>
@@ -396,7 +406,10 @@ $conn->close();
                                                 <select class="form-control" name="status" required>
                                                     <option value="">Durum Seçin</option>
                                                     <?php foreach ($statuses as $key => $name): ?>
-                                                        <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($artwork['status'] == $key) ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                                                        <option value="<?php echo htmlspecialchars($key); ?>" 
+                                                                <?php echo ($artwork['status'] == $key) ? 'selected' : ''; ?>>
+                                                            <?php echo htmlspecialchars($name); ?>
+                                                        </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -436,32 +449,10 @@ $conn->close();
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="width">Genişlik</label>
-                                                <input type="number" step="0.01" min="0" class="form-control" id="width" name="width" value="<?php echo $artwork['width']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="height">Yükseklik</label>
-                                                <input type="number" step="0.01" min="0" class="form-control" id="height" name="height" value="<?php echo $artwork['height']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="depth">Derinlik</label>
-                                                <input type="number" step="0.01" min="0" class="form-control" id="depth" name="depth" value="<?php echo $artwork['depth']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <label for="dimension_unit">Ölçü Birimi</label>
-                                                <select class="form-control" id="dimension_unit" name="dimension_unit">
-                                                    <option value="cm" <?php echo ($artwork['dimension_unit'] == 'cm') ? 'selected' : ''; ?>>cm</option>
-                                                    <option value="inch" <?php echo ($artwork['dimension_unit'] == 'inch') ? 'selected' : ''; ?>>inch</option>
-                                                    <option value="mm" <?php echo ($artwork['dimension_unit'] == 'mm') ? 'selected' : ''; ?>>mm</option>
-                                                </select>
+                                                <label for="dimensions">Boyut</label>
+                                                <input type="text" class="form-control" id="dimensions" name="dimensions" value="<?php echo htmlspecialchars($artwork['dimensions'] ?? ''); ?>">
                                             </div>
                                         </div>
                                     </div>
@@ -479,7 +470,12 @@ $conn->close();
                                                 <img src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo $artwork['title']; ?>" class="img-thumbnail" style="max-height: 200px;">
                                             </div>
                                         <?php endif; ?>
-                                        <input type="file" class="form-control" id="image" name="image">
+                                        <div class="input-group">
+                                            <div class="custom-file">
+                                                <input type="file" class="custom-file-input" id="image" name="image">
+                                                <label class="custom-file-label" for="image">Dosya Seçin</label>
+                                            </div>
+                                        </div>
                                         <small class="text-muted">Yeni bir görsel yüklerseniz, mevcut görsel değiştirilecektir.</small>
                                     </div>
                                 </div>
@@ -514,7 +510,44 @@ $conn->close();
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 5 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- bs-custom-file-input -->
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input@1.3.4/dist/bs-custom-file-input.min.js"></script>
 <!-- AdminLTE 3 App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/tr.js"></script>
+<!-- Tempus Dominus Bootstrap 4 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<script>
+$(function () {
+    // Özel dosya input'u için
+    bsCustomFileInput.init();
+    
+    // Tarih seçici
+    $('#datetimepicker1').datetimepicker({
+        format: 'DD.MM.YYYY',
+        locale: 'tr',
+        icons: {
+            time: 'far fa-clock',
+            date: 'far fa-calendar',
+            up: 'fas fa-arrow-up',
+            down: 'fas fa-arrow-down',
+            previous: 'fas fa-chevron-left',
+            next: 'fas fa-chevron-right',
+            today: 'fas fa-calendar-check',
+            clear: 'far fa-trash-alt',
+            close: 'far fa-times-circle'
+        }
+    });
+    
+    // Dosya seçildiğinde label'ı güncelle
+    $('#image').on('change', function() {
+        var fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').html(fileName);
+    });
+});
+</script>
 </body>
 </html> 

@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Sanat Eserleri</title>
-    <!-- Önce jQuery yüklenmeli -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
 <?php
 session_start();
 require_once '../../includes/functions.php';
@@ -28,20 +19,39 @@ $conn = connectDB();
 $message = '';
 $message_type = '';
 
-// Eser silme işlemi
+// Eser geri getirme işlemi
+if (isset($_GET['restore']) && !empty($_GET['restore'])) {
+    $id = filter_var($_GET['restore'], FILTER_VALIDATE_INT);
+    
+    if ($id) {
+        $stmt = $conn->prepare("UPDATE artworks SET deleted_at = NULL WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        
+        if ($stmt->execute()) {
+            $message = "Eser başarıyla geri getirildi.";
+            $message_type = "success";
+        } else {
+            $message = "Eser geri getirilirken bir hata oluştu: " . $conn->error;
+            $message_type = "danger";
+        }
+        
+        $stmt->close();
+    }
+}
+
+// Eser kalıcı silme işlemi
 if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     $id = filter_var($_GET['delete'], FILTER_VALIDATE_INT);
     
     if ($id) {
-        // Yumuşak silme (soft delete)
-        $stmt = $conn->prepare("UPDATE artworks SET deleted_at = NOW() WHERE id = ?");
+        $stmt = $conn->prepare("DELETE FROM artworks WHERE id = ?");
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
-            $message = "Eser çöp kutusuna taşındı.";
+            $message = "Eser kalıcı olarak silindi.";
             $message_type = "success";
         } else {
-            $message = "Eser çöp kutusuna taşınırken bir hata oluştu: " . $conn->error;
+            $message = "Eser silinirken bir hata oluştu: " . $conn->error;
             $message_type = "danger";
         }
         
@@ -73,7 +83,7 @@ if ($statuses_result && $statuses_result->num_rows > 0) {
 
 // Sanat eserlerini getir - ID'ye göre azalan sırada (en yüksek ID ilk başta)
 $artworks = [];
-$sql = "SELECT * FROM artworks WHERE deleted_at IS NULL ORDER BY id DESC";
+$sql = "SELECT * FROM artworks WHERE deleted_at IS NOT NULL ORDER BY id DESC";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
@@ -86,9 +96,10 @@ if ($result && $result->num_rows > 0) {
 $conn->close();
 
 // Sayfa başlığı ve breadcrumb
-$page_title = "Sanat Eserleri";
+$page_title = "Çöp Kutusu";
 $breadcrumb = '<li class="breadcrumb-item"><a href="dashboard.php">Ana Sayfa</a></li>
-               <li class="breadcrumb-item active">Sanat Eserleri</li>';
+               <li class="breadcrumb-item"><a href="artworks.php">Sanat Eserleri</a></li>
+               <li class="breadcrumb-item active">Çöp Kutusu</li>';
 
 // DataTables için ek CSS
 $additional_css = '
@@ -197,9 +208,15 @@ $(document).ready(function() {
     });
 });
 
-// Silme işlemi doğrulama fonksiyonu
+// İşlem doğrulama fonksiyonları
+function confirmRestore(id) {
+    if (confirm("Bu eseri çöp kutusundan geri getirmek istediğinize emin misiniz?")) {
+        window.location.href = "?restore=" + id;
+    }
+}
+
 function confirmDelete(id) {
-    if (confirm("Bu eseri çöp kutusuna taşımak istiyor musunuz?")) {
+    if (confirm("DİKKAT: Bu eser kalıcı olarak silinecek ve geri getirilemeyecektir! Devam etmek istiyor musunuz?")) {
         window.location.href = "?delete=" + id;
     }
 }
@@ -211,13 +228,10 @@ include 'templates/header.php';
 
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">Sanat Eserleri Listesi</h3>
+        <h3 class="card-title">Çöp Kutusu</h3>
         <div class="card-tools">
-            <a href="artwork_add.php" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Yeni Eser Ekle
-            </a>
-            <a href="trash.php" class="btn btn-secondary ml-2">
-                <i class="fas fa-trash"></i> Çöp Kutusu
+            <a href="artworks.php" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Aktif Eserlere Dön
             </a>
         </div>
     </div>
@@ -231,77 +245,89 @@ include 'templates/header.php';
             </div>
         <?php endif; ?>
         
-        <table id="artworksTable" class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Resim</th>
-                    <th>Eser Adı</th>
-                    <th>Doğrulama Kodu</th>
-                    <th>Boyut</th>
-                    <th>Teknik</th>
-                    <th>Durum</th>
-                    <th>Tarih</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($artworks as $artwork): ?>
-                <tr>
-                    <td><?php echo $artwork['id']; ?></td>
-                    <td>
-                        <?php if (!empty($artwork['image_path'])): ?>
-                            <img data-src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo htmlspecialchars($artwork['title']); ?>" class="artwork-thumbnail lazy-load" src="../../assets/img/placeholder.php">
-                        <?php else: ?>
-                            <span class="badge badge-secondary">Resim Yok</span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo htmlspecialchars($artwork['title']); ?></td>
-                    <td><?php echo htmlspecialchars($artwork['verification_code']); ?></td>
-                    <td><?php echo htmlspecialchars($artwork['dimensions'] . ' ' . $artwork['size']); ?></td>
-                    <td><?php echo isset($techniques[$artwork['technique']]) ? htmlspecialchars($techniques[$artwork['technique']]) : htmlspecialchars($artwork['technique']); ?></td>
-                    <td>
-                        <?php
-                        // Status değerine karşılık gelen ismi $statuses dizisinden al
-                        $status_text = isset($statuses[$artwork['status']]) ? $statuses[$artwork['status']] : $artwork['status'];
-                        
-                        // Durum anahtarlarına göre renkler
-                        if ($artwork['status'] == 'satildi') {
-                            $status_class = 'badge-danger';
-                        } elseif ($artwork['status'] == 'satista') {
-                            $status_class = 'badge-warning';
-                        } elseif ($artwork['status'] == 'arsiv') {
-                            $status_class = 'badge-secondary';
-                        } else {
-                            $status_class = 'badge-info';
-                        }
-                        ?>
-                        <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
-                    </td>
-                    <td><?php echo !empty($artwork['print_date']) ? date('d.m.Y', strtotime($artwork['print_date'])) : '-'; ?></td>
-                    <td>
-                        <div class="btn-group">
-                            <a href="artwork_view.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-info" title="Görüntüle">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="artwork_edit.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-warning" title="Düzenle">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            <button type="button" onclick="confirmDelete(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-secondary" title="Çöp Kutusuna Taşı">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+        <?php if (empty($artworks)): ?>
+            <div class="alert alert-info">
+                Çöp kutusunda eser bulunmamaktadır.
+            </div>
+        <?php else: ?>
+            <table id="artworksTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Resim</th>
+                        <th>Eser Adı</th>
+                        <th>Doğrulama Kodu</th>
+                        <th>Boyut</th>
+                        <th>Teknik</th>
+                        <th>Durum</th>
+                        <th>Silinme Tarihi</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($artworks as $artwork): ?>
+                    <tr>
+                        <td><?php echo $artwork['id']; ?></td>
+                        <td>
+                            <?php if (!empty($artwork['image_path'])): ?>
+                                <img data-src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo htmlspecialchars($artwork['title']); ?>" class="artwork-thumbnail lazy-load" src="../../assets/img/placeholder.php">
+                            <?php else: ?>
+                                <span class="badge badge-secondary">Resim Yok</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($artwork['title']); ?></td>
+                        <td><?php echo htmlspecialchars($artwork['verification_code']); ?></td>
+                        <td><?php echo htmlspecialchars($artwork['dimensions'] . ' ' . $artwork['size']); ?></td>
+                        <td><?php echo isset($techniques[$artwork['technique']]) ? htmlspecialchars($techniques[$artwork['technique']]) : htmlspecialchars($artwork['technique']); ?></td>
+                        <td>
+                            <?php
+                            $status_class = '';
+                            
+                            // Status değerini kullanarak artwork_statuses tablosunda arama yap
+                            $status_text = isset($statuses[$artwork['status']]) ? $statuses[$artwork['status']] : 'Bilinmiyor';
+                            
+                            switch($artwork['status']) {
+                                case 'original':
+                                    $status_class = 'badge-success';
+                                    break;
+                                case 'for_sale':
+                                    $status_class = 'badge-warning';
+                                    break;
+                                case 'sold':
+                                    $status_class = 'badge-danger';
+                                    break;
+                                case 'fake':
+                                    $status_class = 'badge-dark';
+                                    break;
+                                case 'archived':
+                                    $status_class = 'badge-secondary';
+                                    break;
+                                default:
+                                    $status_class = 'badge-info';
+                            }
+                            ?>
+                            <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
+                        </td>
+                        <td><?php echo !empty($artwork['deleted_at']) ? date('d.m.Y H:i', strtotime($artwork['deleted_at'])) : '-'; ?></td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" onclick="confirmRestore(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-success" title="Geri Getir">
+                                    <i class="fas fa-trash-restore"></i>
+                                </button>
+                                <button type="button" onclick="confirmDelete(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-danger" title="Kalıcı Sil">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
     </div>
 </div>
 
 <?php
 // Footer'ı dahil et
 include 'templates/footer.php';
-?>
-</body>
-</html> 
+?> 

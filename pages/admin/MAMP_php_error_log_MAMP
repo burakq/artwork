@@ -10,3 +10,454 @@
 [08-Apr-2025 13:18:12 UTC] Kullanılacak durum değeri: for_sale
 [08-Apr-2025 13:18:14 UTC] Gelen durum değeri: for_sale
 [08-Apr-2025 13:18:14 UTC] Kullanılacak durum değeri: for_sale
+[27-Apr-2025 11:24:03 UTC] Gelen durum değeri: satildi
+[27-Apr-2025 11:24:03 UTC] Kullanılacak durum değeri: original
+[27-Apr-2025 11:26:27 UTC] Gelen durum değeri: satildi
+[27-Apr-2025 11:26:27 UTC] Kullanılacak durum değeri: original
+[27-Apr-2025 11:41:32 UTC] Gelen durum değeri: arsiv
+[27-Apr-2025 11:41:32 UTC] Kullanılacak durum değeri: original
+[27-Apr-2025 11:42:47 UTC] Gelen durum değeri: arsiv
+[27-Apr-2025 11:42:47 UTC] Kullanılacak durum değeri: original
+[27-Apr-2025 11:42:47 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 11:42:47 UTC] Params: title=asdsad, artist_name=asdasdsad, description=Açıklama, image_path=uploads/artworks/asdsad-asdasdsad-1745753325.jpg, location=bodrum, print_date=, technique=giclee, status=original, edition_type=edition, edition_number=29-49, first_owner=Burak YILDIRIM, price=0, dimensions=105x105cm, id=13052
+[27-Apr-2025 11:51:27 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:51:27 UTC] Karşılaştırma: artwork[status]=original, key=arsiv, eşit mi? Hayır
+[27-Apr-2025 11:51:27 UTC] Karşılaştırma: artwork[status]=original, key=satildi, eşit mi? Hayır
+[27-Apr-2025 11:51:27 UTC] Karşılaştırma: artwork[status]=original, key=satista, eşit mi? Hayır
+[27-Apr-2025 11:51:28 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:51:28 UTC] Karşılaştırma: artwork[status]=original, key=arsiv, eşit mi? Hayır
+[27-Apr-2025 11:51:28 UTC] Karşılaştırma: artwork[status]=original, key=satildi, eşit mi? Hayır
+[27-Apr-2025 11:51:28 UTC] Karşılaştırma: artwork[status]=original, key=satista, eşit mi? Hayır
+[27-Apr-2025 11:52:00 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:52:00 UTC] Karşılaştırma: artwork[status]=original, key=arsiv, eşit mi? Hayır
+[27-Apr-2025 11:52:00 UTC] Karşılaştırma: artwork[status]=original, key=satildi, eşit mi? Hayır
+[27-Apr-2025 11:52:00 UTC] Karşılaştırma: artwork[status]=original, key=satista, eşit mi? Hayır
+[27-Apr-2025 11:52:01 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:52:01 UTC] Karşılaştırma: artwork[status]=original, key=arsiv, eşit mi? Hayır
+[27-Apr-2025 11:52:01 UTC] Karşılaştırma: artwork[status]=original, key=satildi, eşit mi? Hayır
+[27-Apr-2025 11:52:01 UTC] Karşılaştırma: artwork[status]=original, key=satista, eşit mi? Hayır
+[27-Apr-2025 11:52:51 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:53:04 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:55:14 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:55:14 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:55:14 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:55:14 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:55:14 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:55:31 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:55:31 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:55:31 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:55:31 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:55:31 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:55:35 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:55:35 UTC] Form gönderildi, durum değeri: satildi
+[27-Apr-2025 11:55:35 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 11:55:35 UTC] Güncellenecek durum: satildi
+[27-Apr-2025 11:57:08 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:08 UTC] Form gönderildi, kullanılacak durum: 'satildi', geçerli mi: Evet
+[27-Apr-2025 11:57:08 UTC] SQL: UPDATE artworks SET 
+                title = ?, 
+                artist_name = ?, 
+                description = ?, 
+                image_path = ?, 
+                location = ?, 
+                print_date = ?, 
+                technique = ?, 
+                status = ?,
+                edition_type = ?,
+                edition_number = ?,
+                first_owner = ?,
+                price = ?, 
+                dimensions = ?, 
+                updated_at = NOW() 
+                WHERE id = ?
+[27-Apr-2025 11:57:08 UTC] Güncellenecek durum: 'satildi'
+[27-Apr-2025 11:57:09 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:09 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:09 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:09 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:09 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:10 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:10 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:10 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:10 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:10 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:12 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:12 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:15 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:15 UTC] Mevcut durum (DB): original
+[27-Apr-2025 11:57:15 UTC] Durum karşılaştırma: DB='original', Anahtar='arsiv', Eşleşme: Hayır
+[27-Apr-2025 11:57:15 UTC] Durum karşılaştırma: DB='original', Anahtar='satildi', Eşleşme: Hayır
+[27-Apr-2025 11:57:15 UTC] Durum karşılaştırma: DB='original', Anahtar='satista', Eşleşme: Hayır
+[27-Apr-2025 11:57:18 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 11:57:18 UTC] Form gönderildi, kullanılacak durum: 'arsiv', geçerli mi: Evet
+[27-Apr-2025 11:57:18 UTC] SQL: UPDATE artworks SET 
+                title = ?, 
+                artist_name = ?, 
+                description = ?, 
+                image_path = ?, 
+                location = ?, 
+                print_date = ?, 
+                technique = ?, 
+                status = ?,
+                edition_type = ?,
+                edition_number = ?,
+                first_owner = ?,
+                price = ?, 
+                dimensions = ?, 
+                updated_at = NOW() 
+                WHERE id = ?
+[27-Apr-2025 11:57:18 UTC] Güncellenecek durum: 'arsiv'
+[27-Apr-2025 12:05:21 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 12:05:21 UTC] Veritabanından gelen status: original, dönüştürülen status_key: 
+[27-Apr-2025 12:05:24 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 12:05:24 UTC] Formdan gelen status_key: satista, dönüştürülen enum değeri: for_sale
+[27-Apr-2025 12:05:24 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 12:05:24 UTC] Güncellenecek status değeri: for_sale
+[27-Apr-2025 12:05:24 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:05:28 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:05:28 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:05:31 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:05:31 UTC] Formdan gelen status_key: satildi, dönüştürülen enum değeri: sold
+[27-Apr-2025 12:05:31 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 12:05:31 UTC] Güncellenecek status değeri: sold
+[27-Apr-2025 12:05:31 UTC] Veritabanından gelen status: sold, dönüştürülen status_key: satildi
+[27-Apr-2025 12:05:35 UTC] Mevcut durum (DB'den alınan): sold
+[27-Apr-2025 12:05:35 UTC] Veritabanından gelen status: sold, dönüştürülen status_key: satildi
+[27-Apr-2025 12:05:41 UTC] Mevcut durum (DB'den alınan): sold
+[27-Apr-2025 12:05:41 UTC] Veritabanından gelen status: sold, dönüştürülen status_key: satildi
+[27-Apr-2025 12:05:44 UTC] Mevcut durum (DB'den alınan): sold
+[27-Apr-2025 12:05:44 UTC] Formdan gelen status_key: arsiv, dönüştürülen enum değeri: archived
+[27-Apr-2025 12:05:44 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 12:05:44 UTC] Güncellenecek status değeri: archived
+[27-Apr-2025 12:05:44 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:05:53 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:05:53 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:07:44 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:07:44 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:09:14 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:09:14 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:11:30 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:11:30 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:11:47 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:11:47 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:14:46 UTC] Mevcut durum (DB'den alınan): archived
+[27-Apr-2025 12:14:46 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 12:26:00 UTC] Mevcut durum (DB'den alınan): original
+[27-Apr-2025 12:26:00 UTC] Veritabanından gelen status: original, dönüştürülen status_key: 
+[27-Apr-2025 12:26:46 UTC] Ekleme formundan gelen status_key: satista, dönüştürülen enum değeri: for_sale
+[27-Apr-2025 12:26:49 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:26:49 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:00 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:00 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:06 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:06 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:10 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:10 UTC] Formdan gelen status_key: satista, dönüştürülen enum değeri: for_sale
+[27-Apr-2025 12:30:10 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 12:30:10 UTC] Güncellenecek status değeri: for_sale
+[27-Apr-2025 12:30:10 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:14 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:14 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:42 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:42 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:30:54 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:30:54 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:36:36 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:36:36 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 12:55:59 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 12:55:59 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:02:41 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:02:41 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:02:41 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:02:41 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:04:20 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:04:20 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:08:32 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:08:32 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:12:39 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:12:39 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:12:44 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:12:44 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:34:44 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:34:44 UTC] Veritabanından gelen status: satildi, dönüştürülen status_key: 
+[27-Apr-2025 13:34:48 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:34:48 UTC] Formdan gelen status_key: satista, dönüştürülen enum değeri: for_sale
+[27-Apr-2025 13:34:48 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:34:48 UTC] Güncellenecek status değeri: for_sale
+[27-Apr-2025 13:34:48 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:35:52 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:35:52 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:38:26 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:38:26 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:38:30 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:38:30 UTC] Formdan gelen status_key: satista, dönüştürülen enum değeri: for_sale
+[27-Apr-2025 13:38:30 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:38:30 UTC] Güncellenecek status değeri: for_sale
+[27-Apr-2025 13:38:30 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:40:09 UTC] Mevcut durum (DB'den alınan): for_sale
+[27-Apr-2025 13:40:09 UTC] Veritabanından gelen status: for_sale, dönüştürülen status_key: satista
+[27-Apr-2025 13:40:29 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:40:29 UTC] Veritabanından gelen status: satista, dönüştürülen status_key: 
+[27-Apr-2025 13:40:31 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:40:31 UTC] Veritabanından gelen status: satista, dönüştürülen status_key: 
+[27-Apr-2025 13:41:22 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:41:22 UTC] Veritabanından gelen status: satildi, dönüştürülen status_key: 
+[27-Apr-2025 13:41:28 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:41:28 UTC] Formdan gelen status_key: arsiv, dönüştürülen enum değeri: archived
+[27-Apr-2025 13:41:28 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:41:28 UTC] Güncellenecek status değeri: archived
+[27-Apr-2025 13:41:28 UTC] Veritabanından gelen status: archived, dönüştürülen status_key: arsiv
+[27-Apr-2025 13:52:20 UTC] Mevcut durum (DB'den alınan): arsiv
+[27-Apr-2025 13:52:20 UTC] Veritabanından gelen status: arsiv, dönüştürülen status_key: 
+[27-Apr-2025 13:52:35 UTC] Mevcut durum (DB'den alınan): arsiv
+[27-Apr-2025 13:52:35 UTC] Düzenleme formundan gelen status değeri: satildi
+[27-Apr-2025 13:52:35 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:52:35 UTC] Veritabanından gelen status: satildi, dönüştürülen status_key: 
+[27-Apr-2025 13:52:40 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:52:40 UTC] Veritabanından gelen status: satildi, dönüştürülen status_key: 
+[27-Apr-2025 13:52:43 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:52:43 UTC] Düzenleme formundan gelen status değeri: arsiv
+[27-Apr-2025 13:52:43 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:52:43 UTC] Veritabanından gelen status: arsiv, dönüştürülen status_key: 
+[27-Apr-2025 13:52:46 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:52:46 UTC] Veritabanından gelen status: satista, dönüştürülen status_key: 
+[27-Apr-2025 13:52:50 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:52:50 UTC] Düzenleme formundan gelen status değeri: satista
+[27-Apr-2025 13:52:50 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 13:52:50 UTC] Veritabanından gelen status: satista, dönüştürülen status_key: 
+[27-Apr-2025 13:53:18 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:53:18 UTC] Veritabanından gelen status: satista, dönüştürülen status_key: 
+[27-Apr-2025 13:54:52 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 13:54:55 UTC] Mevcut durum (DB'den alınan): satildi
+[27-Apr-2025 13:54:59 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 14:18:40 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 14:23:21 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 14:23:26 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 14:23:26 UTC] Düzenleme formundan gelen status değeri: satista
+[27-Apr-2025 14:23:26 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?
+[27-Apr-2025 14:23:28 UTC] Mevcut durum (DB'den alınan): satista
+[27-Apr-2025 14:23:28 UTC] Düzenleme formundan gelen status değeri: satista
+[27-Apr-2025 14:23:28 UTC] SQL: UPDATE artworks SET 
+            title = ?, 
+            artist_name = ?, 
+            description = ?, 
+            image_path = ?, 
+            location = ?, 
+            print_date = ?, 
+            technique = ?, 
+            status = ?,
+            edition_type = ?,
+            edition_number = ?,
+            first_owner = ?,
+            price = ?, 
+            dimensions = ?, 
+            updated_at = NOW() 
+            WHERE id = ?

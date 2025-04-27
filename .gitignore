@@ -14,6 +14,29 @@ Thumbs.db
 
 # Log files
 *.log
+MAMP_php_error_log_MAMP
 
 # Cache files
-*.cache 
+*.cache
+
+# Temp files
+*.tmp
+*.bak
+*.swp
+
+# SSH Keys
+text.txt
+text.txt.pub
+
+# Big archives and data files
+*.zip
+*.xlsx
+songuncel.xlsx
+"Arşiv.zip"
+
+# Example uploads
+uploads/artworks/*
+!uploads/artworks/.gitkeep
+
+# Large file paths we don't need to track
+upload/ 
