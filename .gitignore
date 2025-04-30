@@ -39,4 +39,7 @@ uploads/artworks/*
 !uploads/artworks/.gitkeep
 
 # Large file paths we don't need to track
-upload/ 
+upload/
+
+# MAMP log dosyaları
+**/MAMP_php_error_log_MAMP 
