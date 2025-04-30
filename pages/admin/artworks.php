@@ -286,6 +286,9 @@ include 'templates/header.php';
                             <a href="artwork_edit.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-warning" title="Düzenle">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            <button type="button" onclick="copyArtwork(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-primary" title="Kopyala">
+                                <i class="fas fa-copy"></i>
+                            </button>
                             <button type="button" onclick="confirmDelete(<?php echo $artwork['id']; ?>)" class="btn btn-sm btn-secondary" title="Çöp Kutusuna Taşı">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -302,5 +305,29 @@ include 'templates/header.php';
 // Footer'ı dahil et
 include 'templates/footer.php';
 ?>
+
+<script>
+function copyArtwork(id) {
+    if (confirm('Bu eseri kopyalamak istediğinizden emin misiniz?')) {
+        $.ajax({
+            url: 'artwork_copy.php',
+            type: 'GET',
+            data: { id: id },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    alert('Eser başarıyla kopyalandı');
+                    location.reload();
+                } else {
+                    alert('Hata: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('Bir hata oluştu');
+            }
+        });
+    }
+}
+</script>
 </body>
 </html> 
