@@ -42,12 +42,7 @@ try {
     }
 
     // Dosya listesini oluştur
-    $files = [
-        'pages/admin/templates/header.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/header.php',
-        'pages/admin/templates/footer.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/footer.php',
-        'pages/admin/templates/sidebar_menu.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/sidebar_menu.php',
-        'config/db.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/config/db.php'
-    ];
+    $files = [];
     
     // Recursive olarak dosyaları listele
     function getFiles($path, $baseUrl) {
@@ -88,20 +83,8 @@ try {
     // Ana dizinden başla
     getFiles('', $apiUrl);
 
-    // Önemli dosyaları zorunlu olarak ekle
-    $requiredFiles = [
-        'version.txt',
-        'includes/functions.php',
-        'pages/admin/templates/header.php',
-        'pages/admin/templates/footer.php',
-        'pages/admin/templates/sidebar_menu.php'
-    ];
-
-    foreach ($requiredFiles as $file) {
-        if (!isset($files[$file])) {
-            $files[$file] = 'https://raw.githubusercontent.com/burakq/artwork/main/' . $file;
-        }
-    }
+    // Sadece config/db.php dosyasını atla
+    unset($files['config/db.php']);
 
     $context = stream_context_create([
         'http' => [
@@ -118,11 +101,6 @@ try {
     ]);
 
     foreach ($files as $localPath => $remoteUrl) {
-        // db.php dosyasını atla
-        if ($localPath === 'config/db.php') {
-            continue;
-        }
-        
         $content = @file_get_contents($remoteUrl, false, $context);
         if ($content !== false) {
             // Dosyayı yaz
