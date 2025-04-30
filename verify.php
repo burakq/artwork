@@ -164,15 +164,17 @@ if ($artwork && strpos($artwork['image_path'], 'image_proxy.php') !== false) {
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa;
-            padding-top: 60px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Myriad Pro', sans-serif;
+            background-color: #fff;
             <?php if (!empty($background_image)): ?>
             background-image: url('<?php echo $background_image; ?>');
             <?php else: ?>
             background-image: url('assets/img/bg-pattern.png');
             <?php endif; ?>
             background-repeat: repeat;
-            background-attachment: fixed;
+            padding-top: 60px;
         }
         .verification-container {
             max-width: 1200px;
@@ -697,8 +699,8 @@ if ($artwork && strpos($artwork['image_path'], 'image_proxy.php') !== false) {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <div class="qr-code mb-3">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<?php echo urlencode($site_url . '/verify.php?code=' . $artwork['verification_code']); ?>" alt="QR Kodu" class="img-fluid">
+                        <div class="qr-code">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<?php echo urlencode($site_url . '/verify.php?code=' . $artwork['verification_code']); ?>&format=png&bgcolor=FFFFFF00&color=000000" alt="QR Kodu" class="img-fluid">
                         </div>
                         <p>Bu QR kodu telefonunuzla tarayarak eserin orijinalliğini doğrulayabilirsiniz.</p>
                     </div>
@@ -810,6 +812,8 @@ if ($artwork && strpos($artwork['image_path'], 'image_proxy.php') !== false) {
                 <img src="<?php echo $logo_url; ?>" alt="ERBİLKARE" class="img-fluid" style="max-height: 60px;">
             </div>
             <p class="mt-3 text-muted">&copy; <?php echo date('Y'); ?> This work is unique and registered in the Erbilkare.com archive.</p>
+            <p class="mt-3 text-muted">Sitemizden QR ve NFC ile doğrulama yapabilirsiniz. Detaylı bilgi için <a href="https://www.erbilkare.com/nfc-iletisim" target="_blank">tıklayınız.</a></p>
+
         </div> 
     </div>
 
@@ -847,152 +851,229 @@ if ($artwork && strpos($artwork['image_path'], 'image_proxy.php') !== false) {
         <head>
             <meta charset="UTF-8">
             <title>Sertifika Önizleme</title>
-            <style>
-              @page {
+              <style>
+                @font-face {
+                font-family: 'Skia-Light';
+                src: url('fonts/Skia-Light.ttf') format('truetype');
+                }
+
+                @font-face {
+                font-family: 'Myriad Pro';
+                src: url('fonts/MyriadPro-Regular.otf') format('opentype');
+                }
+
+                @page {
                 size: A4 landscape;
                 margin: 0;
-              }
-              body {
+                }
+
+                body {
                 margin: 0;
                 padding: 0;
-                background: url('<?php echo !empty($background_image) ? $background_image : "assets/img/bg-pattern.png"; ?>') no-repeat center center;
-                background-size: cover;
-                font-family: 'Arial', sans-serif;
-                color: #333;
+                font-family: 'Myriad Pro', sans-serif;
+                background-color: #fff;
+                <?php if (!empty($background_image)): ?>
+                background-image: url('<?php echo $background_image; ?>');
+                <?php else: ?>
+                background-image: url('assets/img/bg-pattern.png');
+                <?php endif; ?>
+                background-repeat: repeat;
+                }
+
+                .certificate-container {
+                margin: 0px 20px 0px 20px;
+                padding: 0px 40px 0px 40px;
                 position: relative;
-                width: 100%;
-                height: 100vh;
-              }
-              .certificate-container {
-                position: absolute;
-                top: 2%;
-                left: 2%;
-                right: 2%;
-                bottom: 2%;
-                border: 2px solid #333;
-                padding: 20px;
-                box-sizing: border-box;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
-                align-items: flex-start;
-                background-color: rgba(255,255,255,0.85); /* hafif beyaz şeffaflık */
-              }
-              .left-side {
-                width: 48%;
-              }
-              .left-side img {
+                }
+
+                .left-side {
+                width: 55%;
+                }
+
+                .left-side img {
                 width: 100%;
-                height: auto;
-                object-fit: contain;
                 border: 1px solid #999;
-              }
-              .right-side {
-                width: 48%;
+                object-fit: contain;
+                }
+
+                .right-side {
+                width: 35%;
                 padding-left: 20px;
-                box-sizing: border-box;
-              }
-              .right-side h1 {
-                font-size: 24px;
+                }
+
+                .header {
                 text-align: center;
-                margin-bottom: 5px;
-                letter-spacing: 2px;
-              }
-              .right-side h2 {
-                font-size: 18px;
-                text-align: center;
-                margin: 5px 0 20px;
+                margin-top: 25px;
+                }
+
+                .header h1 {
+                font-weight: lighter;
+                font-family: 'Skia-Light', sans-serif;
+                font-size: 60px;
+                margin: 0;
+                }
+
+                .header h2 {
+                font-family: 'Myriad Pro', sans-serif;
+                font-size: 30px;
+                margin-top: 5px;
                 font-weight: normal;
-              }
-              .info-section {
+                }
+
+                .info-section {
                 font-size: 16px;
-                margin-bottom: 20px;
-              }
-              .info-section b {
+                margin-top: 30px;
+                }
+
+                .info-section b {
                 display: inline-block;
                 width: 150px;
-              }
-              .verification {
+                }
+
+                .verification {
                 text-align: center;
-                margin-top: 30px;
-              }
-              .verification-code {
+                margin-top: 40px;
+                }
+
+                .verification-code {
                 font-weight: bold;
-                font-size: 20px;
-                margin-top: 10px;
-              }
-              .footer {
+                font-size: 30px;
+                }
+
+                .logo-top {
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                }
+
+                .logo-bottom {
                 position: absolute;
                 bottom: 20px;
-                left: 20px;
-                right: 20px;
+                left: 50%;
+                transform: translateX(-50%);
                 text-align: center;
                 font-size: 14px;
                 color: #555;
-              }
-              .footer img {
-                height: 50px;
-                margin-bottom: 5px;
-              }
-            </style>
+                }
+
+                .logo-bottom img,
+                .logo-top img {
+                height: 100px;
+                }
+                .qr-code img {
+                    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+    padding: 0.7rem 1rem;
+    width: 80px;
+    height: 80px;
+                }
+           .qr-code small {
+            margin-top: 0.5rem;
+            display: block;
+        }
+            .qr-code {
+                        margin-top: 25px;
+                        display: flex;
+                        flex-direction: row-reverse;
+                        align-items: flex-start;
+                        justify-content: center;
+                        text-align: center;
+                        align-content: flex-start;
+                        flex-wrap: nowrap;
+        }
+    .qr-code svg {
+                    border: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+    padding: 0.7rem 1rem;
+    width: 80px;
+    height: 80px;
+                }
+  </style>
         </head>
         <body>
 
-        <div class="certificate-container">
-          <div class="left-side">
-            <img src="<?php echo $image_path; ?>" alt="<?php echo $artwork['title']; ?>">
-          </div>
-          <div class="right-side">
-            <h1>ERBİLKARE</h1>
-            <h2>Certificate of Authenticity</h2>
-            
-            <div class="info-section">
-              <p><b>Artist:</b> <?php echo $artwork['artist_name']; ?></p>
-              <p><b>Artwork Name:</b> <?php echo $artwork['title']; ?></p>
-              <?php if ($artwork['print_date']): ?>
-              <p><b>Print Date:</b> <?php echo date('d.m.Y', strtotime($artwork['print_date'])); ?></p>
-              <?php endif; ?>
-              <?php if ($artwork['dimensions']): ?>
-              <p><b>Print Size:</b> <?php echo $artwork['dimensions']; ?></p>
-              <?php endif; ?>
-              <?php if ($artwork['technique']): ?>
-              <p><b>Print Method:</b> <?php echo !empty($artwork['technique_name']) ? $artwork['technique_name'] : $artwork['technique']; ?></p>
-              <?php endif; ?>
-              <?php if (!empty($artwork['edition_name']) || ($artwork['edition_type'] && $artwork['edition_number'])): ?>
-              <p><b>Edition:</b> 
-                <?php 
-                if (!empty($artwork['edition_name'])) {
-                    echo $artwork['edition_name'] . (!empty($artwork['edition_number']) ? ' ' . $artwork['edition_number'] : '');
-                } else {
-                    echo $artwork['edition_type'] . ' ' . $artwork['edition_number']; 
-                }
-                ?>
-              </p>
-              <?php endif; ?>
-              <?php if (!empty($artwork['country'])): ?>
-              <p><b>Country of Origin:</b> <?php echo $artwork['country']; ?></p>
-              <?php endif; ?>
-              <?php if (!empty($artwork['first_owner'])): ?>
-              <p><b>First Owner:</b> <?php echo $artwork['first_owner']; ?></p>
-              <?php else: ?>
-              <p><b>First Owner:</b> -</p>
-              <?php endif; ?>
-            </div>
+ 
 
-            <div class="verification">
-              <div>Verification Code</div>
-              <div class="verification-code"><?php echo $artwork['verification_code']; ?></div>
-            </div>
-          </div>
-        </div>
+  <div class="header">
+    <h1>ERBİLKARE</h1>
+    <h2>Certificate of Authenticity</h2>
+  </div>
 
-        <div class="footer">
-          <?php if (!empty($logo_url)): ?>
-            <img src="<?php echo $logo_url; ?>" alt="Erbil Kare Logo"><br>
-          <?php endif; ?>
-          This work is unique and registered in the <b><?php echo $artwork['artist_name']; ?></b> archive.<br>
-          <a href="<?php echo $site_url; ?>" target="_blank"><?php echo $site_url; ?></a>
-        </div>
+  <div class="certificate-container">
+    <div class="left-side">
+      <img src="<?php echo $image_path; ?>" alt="<?php echo $artwork['title']; ?>">
+    </div>
+    <div class="right-side">
+      <div class="info-section">
+        <p><b>Artist:</b> <?php echo $artwork['artist_name']; ?></p>
+        <p><b>Artwork Name:</b> <?php echo $artwork['title']; ?></p>
+        <?php if ($artwork['print_date']): ?>
+        <p><b>Print Date:</b> <?php echo date('d.m.Y', strtotime($artwork['print_date'])); ?></p>
+        <?php endif; ?>
+        <?php if ($artwork['dimensions']): ?>
+        <p><b>Print Size:</b> <?php echo $artwork['dimensions']; ?></p>
+        <?php endif; ?>
+        <?php if ($artwork['technique']): ?>
+        <p><b>Print Method:</b> <?php echo !empty($artwork['technique_name']) ? $artwork['technique_name'] : $artwork['technique']; ?></p>
+        <?php endif; ?>
+        <?php if (!empty($artwork['edition_name']) || ($artwork['edition_type'] && $artwork['edition_number'])): ?>
+        <p><b>Edition:</b> 
+          <?php 
+          if (!empty($artwork['edition_name'])) {
+              echo $artwork['edition_name'] . (!empty($artwork['edition_number']) ? ' ' . $artwork['edition_number'] : '');
+          } else {
+              echo $artwork['edition_type'] . ' ' . $artwork['edition_number']; 
+          }
+          ?>
+        </p>
+        <?php endif; ?>
+        <?php if (!empty($artwork['country'])): ?>
+        <p><b>Country of Origin:</b> <?php echo $artwork['country']; ?></p>
+        <?php endif; ?>
+        <?php if (!empty($artwork['first_owner'])): ?>
+        <p><b>First Owner:</b> <?php echo $artwork['first_owner']; ?></p>
+        <?php else: ?>
+        <p><b>First Owner:</b> -</p>
+        <?php endif; ?>
+      </div>
+
+      <div class="verification">
+        <div>Verification Code</div>
+        <div class="verification-code"><?php echo $artwork['verification_code']; ?></div>
+      </div>
+    
+      <div class="qr-code">
+      <div class="left-side">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=<?php echo urlencode($site_url . '/verify.php?code=' . $artwork['verification_code']); ?>&format=png&bgcolor=FFFFFF00&color=000000" alt="QR Kodu" class="img-fluid">
+               <small>QR Kod</small>
+     </div>
+     
+                 <div class="right-side">
+<svg class="svg-inline--fa fa-wifi" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="wifi" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg=""><path fill="currentColor" d="M54.2 202.9C123.2 136.7 216.8 96 320 96s196.8 40.7 265.8 106.9c12.8 12.2 33 11.8 45.2-.9s11.8-33-.9-45.2C549.7 79.5 440.4 32 320 32S90.3 79.5 9.8 156.7C-2.9 169-3.3 189.2 8.9 202s32.5 13.2 45.2 .9zM320 256c56.8 0 108.6 21.1 148.2 56c13.3 11.7 33.5 10.4 45.2-2.8s10.4-33.5-2.8-45.2C459.8 219.2 393 192 320 192s-139.8 27.2-190.5 72c-13.3 11.7-14.5 31.9-2.8 45.2s31.9 14.5 45.2 2.8c39.5-34.9 91.3-56 148.2-56zm64 160a64 64 0 1 0 -128 0 64 64 0 1 0 128 0z"></path></svg>               
+<small>Eserlerimizde NFC İletişimi vardır.</small>
+                 </div>
+     
+     </div>
+
+
+    </div>
+  </div>
+
+  <div class="logo-bottom">
+    <?php if (!empty($logo_url)): ?>
+      <img src="<?php echo $logo_url; ?>" alt="Logo Alt"><br>
+    <?php endif; ?>
+    This work is unique and registered in the <b><?php echo $artwork['artist_name']; ?></b> archive.<br>
+    <a href="<?php echo $site_url; ?>" target="_blank"><?php echo $site_url; ?></a>
+  </div>
 
         </body>
         </html>

@@ -461,3 +461,5 @@
             dimensions = ?, 
             updated_at = NOW() 
             WHERE id = ?
+[30-Apr-2025 00:56:34 UTC] Mevcut durum (DB'den alınan): satista
+[30-Apr-2025 02:01:36 UTC] Mevcut durum (DB'den alınan): satista

@@ -42,8 +42,12 @@ try {
     }
 
     // Dosya listesini oluştur
-    $files = [];
-    $data = json_decode($response, true);
+    $files = [
+        'pages/admin/templates/header.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/header.php',
+        'pages/admin/templates/footer.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/footer.php',
+        'pages/admin/templates/sidebar_menu.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/pages/admin/templates/sidebar_menu.php',
+        'config/db.php' => 'https://raw.githubusercontent.com/burakyildirim/ArtworkAuthCompPHP/main/config/db.php'
+    ];
     
     // Recursive olarak dosyaları listele
     function getFiles($path, $baseUrl) {
@@ -122,12 +126,13 @@ try {
         $content = @file_get_contents($remoteUrl, false, $context);
         if ($content !== false) {
             // Dosyayı yaz
-            if (file_put_contents('../../' . $localPath, $content) === false) {
-                throw new Exception("$localPath dosyası yazılamadı");
+            $targetPath = '../../' . $localPath;
+            if (file_put_contents($targetPath, $content) === false) {
+                throw new Exception("$localPath dosyası yazılamadı (Hedef: $targetPath)");
             }
             $output[] = "$localPath başarıyla güncellendi";
         } else {
-            throw new Exception("$localPath dosyası indirilemedi");
+            throw new Exception("$localPath dosyası indirilemedi (URL: $remoteUrl)");
         }
     }
 
