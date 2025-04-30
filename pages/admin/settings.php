@@ -248,6 +248,49 @@ $server_url = empty($site_url) ? (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] 
 
 // Bağlantıyı kapat
 $conn->close();
+
+// GitHub güncelleme kontrolü
+function checkGitHubUpdate() {
+    $current_version = trim(file_get_contents('../../version.txt'));
+    $github_url = 'https://raw.githubusercontent.com/burakq/artwork/main/version.txt';
+    
+    try {
+        $github_version = @file_get_contents($github_url);
+        if ($github_version === false) {
+            return [
+                'status' => 'error',
+                'message' => 'GitHub bağlantısı kurulamadı.'
+            ];
+        }
+        
+        $github_version = trim($github_version);
+        
+        // Sürüm numaralarını karşılaştır
+        if (version_compare($github_version, $current_version, '>')) {
+            return [
+                'status' => 'update',
+                'message' => 'Yeni bir güncelleme mevcut: ' . $github_version,
+                'current_version' => $current_version,
+                'latest_version' => $github_version
+            ];
+        } else {
+            return [
+                'status' => 'current',
+                'message' => 'Güncel sürüm: ' . $current_version,
+                'current_version' => $current_version,
+                'latest_version' => $github_version
+            ];
+        }
+    } catch (Exception $e) {
+        return [
+            'status' => 'error',
+            'message' => 'Güncelleme kontrolü yapılamadı: ' . $e->getMessage()
+        ];
+    }
+}
+
+// Güncelleme durumunu kontrol et
+$update_status = checkGitHubUpdate();
 ?>
 
 <!DOCTYPE html>
@@ -257,6 +300,9 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ayarlar - Artwork Auth Yönetim Paneli</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../../assets/images/favicon.ico">
+    
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <!-- Font Awesome -->
@@ -265,6 +311,17 @@ $conn->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../assets/css/style.css">
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <!-- bs-custom-file-input -->
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <!-- Custom JS -->
+    <script src="../../assets/js/script.js"></script>
 </head>
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
@@ -500,9 +557,9 @@ $conn->close();
                                     <div class="form-group">
                                         <label>Veritabanı Yedeği</label>
                                         <div class="input-group">
-                                            <input type="password" class="form-control" id="backup_password" placeholder="Yedek şifresini girin">
+                                            <input type="password" class="form-control" id="backup_password" name="backup_password" placeholder="Yedek şifresini girin">
                                             <div class="input-group-append">
-                                                <button class="btn btn-warning" type="button" id="download-backup">
+                                                <button class="btn btn-warning" type="submit">
                                                     <i class="fas fa-download"></i> Yedeği İndir
                                                 </button>
                                             </div>
@@ -533,150 +590,140 @@ $conn->close();
     </div>
     <!-- ./wrapper -->
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE 3 -->
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-    <!-- Custom JS -->
-    <script src="../../assets/js/script.js"></script>
-    <!-- Add custom script for copying to clipboard -->
     <script>
-        $(document).ready(function() {
-            bsCustomFileInput.init();
+    $(document).ready(function() {
+        // bs-custom-file-input başlatma
+        bsCustomFileInput.init();
+        
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select();
+            document.execCommand("copy");
+            alert("Kod panoya kopyalandı!");
+        }
+        
+        // Pushmenu toggle
+        $("[data-widget='pushmenu']").on('click', function() {
+            $('body').toggleClass('sidebar-collapse');
+        });
+        
+        // GitHub güncelleme kontrolü
+        function checkGitHubUpdates() {
+            $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncelleme durumu kontrol ediliyor...');
+            $('#github-status').removeClass('alert-success alert-danger alert-warning').addClass('alert-info');
             
-            function copyToClipboard(elementId) {
-                var copyText = document.getElementById(elementId);
-                copyText.select();
-                document.execCommand("copy");
-                alert("Kod panoya kopyalandı!");
-            }
-            
-            // Pushmenu toggle
-            $("[data-widget='pushmenu']").on('click', function() {
-                $('body').toggleClass('sidebar-collapse');
+            $.ajax({
+                url: 'check_github_updates.php',
+                method: 'GET',
+                success: function(response) {
+                    try {
+                        const data = JSON.parse(response);
+                        if (data && data.status) {
+                            if (data.status === 'update') {
+                                $('#github-status').html('<i class="fas fa-exclamation-circle"></i> Yeni güncelleme mevcut: ' + (data.latest_version || '') + ' (Mevcut: ' + (data.current_version || '') + ')');
+                                $('#github-status').removeClass('alert-info').addClass('alert-warning');
+                                $('#apply-updates').show();
+                            } else if (data.status === 'current') {
+                                $('#github-status').html('<i class="fas fa-check-circle"></i> Sistem güncel. Son sürüm: ' + (data.current_version || ''));
+                                $('#github-status').removeClass('alert-info').addClass('alert-success');
+                                $('#apply-updates').hide();
+                            } else if (data.status === 'error') {
+                                $('#github-status').html('<i class="fas fa-times-circle"></i> ' + (data.message || 'Bir hata oluştu'));
+                                $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                            }
+                        } else {
+                            $('#github-status').html('<i class="fas fa-times-circle"></i> Geçersiz yanıt formatı');
+                            $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                        }
+                    } catch (e) {
+                        console.error('Güncelleme kontrolü hatası:', e);
+                        $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu');
+                        $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX hatası:', error);
+                    $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu');
+                    $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                }
             });
-            
-            // GitHub güncelleme kontrolü
-            function checkGitHubUpdates() {
-                $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncelleme durumu kontrol ediliyor...');
+        }
+        
+        // Sayfa yüklendiğinde güncelleme durumunu kontrol et
+        checkGitHubUpdates();
+        
+        // Güncellemeleri kontrol et butonu
+        $('#check-updates').on('click', function() {
+            checkGitHubUpdates();
+        });
+        
+        // Güncellemeleri uygula butonu
+        $('#apply-updates').on('click', function() {
+            if (confirm('Güncellemeleri uygulamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+                $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncellemeler uygulanıyor...');
                 $('#github-status').removeClass('alert-success alert-danger').addClass('alert-info');
+                $('#check-updates, #apply-updates').prop('disabled', true);
                 
                 $.ajax({
-                    url: 'check_github_updates.php',
-                    method: 'GET',
+                    url: 'apply_github_updates.php',
+                    method: 'POST',
                     success: function(response) {
                         try {
                             const data = JSON.parse(response);
-                            if (data.hasUpdates) {
-                                $('#github-status').html('<i class="fas fa-exclamation-circle"></i> Yeni güncelleme mevcut: ' + data.latestVersion);
+                            if (data.success) {
+                                $('#github-status').html('<i class="fas fa-check-circle"></i> Güncellemeler başarıyla uygulandı. Sayfa yenilenecek...');
                                 $('#github-status').removeClass('alert-info').addClass('alert-success');
-                                $('#apply-updates').show();
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 3000);
                             } else {
-                                $('#github-status').html('<i class="fas fa-check-circle"></i> Sistem güncel. Son sürüm: ' + data.currentVersion);
-                                $('#github-status').removeClass('alert-info').addClass('alert-success');
-                                $('#apply-updates').hide();
-                            }
-                        } catch (e) {
-                            $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu.');
-                            $('#github-status').removeClass('alert-info').addClass('alert-danger');
-                        }
-                    },
-                    error: function() {
-                        $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme kontrolü sırasında bir hata oluştu.');
-                        $('#github-status').removeClass('alert-info').addClass('alert-danger');
-                    }
-                });
-            }
-            
-            // Güncellemeleri kontrol et butonu
-            $('#check-updates').on('click', function() {
-                checkGitHubUpdates();
-            });
-            
-            // Güncellemeleri uygula butonu
-            $('#apply-updates').on('click', function() {
-                if (confirm('Güncellemeleri uygulamak istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-                    $('#github-status').html('<i class="fas fa-sync fa-spin"></i> Güncellemeler uygulanıyor...');
-                    $('#github-status').removeClass('alert-success alert-danger').addClass('alert-info');
-                    $('#check-updates, #apply-updates').prop('disabled', true);
-                    
-                    $.ajax({
-                        url: 'apply_github_updates.php',
-                        method: 'POST',
-                        success: function(response) {
-                            try {
-                                const data = JSON.parse(response);
-                                if (data.success) {
-                                    $('#github-status').html('<i class="fas fa-check-circle"></i> Güncellemeler başarıyla uygulandı. Sayfa yenilenecek...');
-                                    $('#github-status').removeClass('alert-info').addClass('alert-success');
-                                    setTimeout(function() {
-                                        window.location.reload();
-                                    }, 3000);
-                                } else {
-                                    $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu: ' + data.message);
-                                    $('#github-status').removeClass('alert-info').addClass('alert-danger');
-                                    $('#check-updates, #apply-updates').prop('disabled', false);
-                                }
-                            } catch (e) {
-                                $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu.');
+                                $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu: ' + data.message);
                                 $('#github-status').removeClass('alert-info').addClass('alert-danger');
                                 $('#check-updates, #apply-updates').prop('disabled', false);
                             }
-                        },
-                        error: function() {
+                        } catch (e) {
                             $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu.');
                             $('#github-status').removeClass('alert-info').addClass('alert-danger');
                             $('#check-updates, #apply-updates').prop('disabled', false);
                         }
-                    });
-                }
-            });
-            
-            // Yedek indirme butonu
-            $('#download-backup').on('click', function() {
-                var password = $('#backup_password').val();
-                if (!password) {
-                    alert('Lütfen yedek şifresini girin.');
-                    return;
-                }
-                
-                // Yedek indirme isteği
-                window.location.href = 'download_backup.php?password=' + encodeURIComponent(password);
-            });
-            
-            // WhatsApp numarası formatını kontrol et
-            $('#whatsapp_number').on('input', function() {
-                var value = $(this).val();
-                if (!/^\d+$/.test(value)) {
-                    $(this).val(value.replace(/\D/g, ''));
-                }
-            });
-            
-            // iframe domainlerini kontrol et
-            $('#allowed_iframe_domains').on('input', function() {
-                var value = $(this).val();
-                // Her satırın geçerli bir domain olup olmadığını kontrol et
-                var lines = value.split('\n');
-                var valid = true;
-                for (var i = 0; i < lines.length; i++) {
-                    var line = lines[i].trim();
-                    if (line && !/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(line)) {
-                        valid = false;
-                        break;
+                    },
+                    error: function() {
+                        $('#github-status').html('<i class="fas fa-times-circle"></i> Güncelleme sırasında bir hata oluştu.');
+                        $('#github-status').removeClass('alert-info').addClass('alert-danger');
+                        $('#check-updates, #apply-updates').prop('disabled', false);
                     }
-                }
-                if (!valid) {
-                    $(this).addClass('is-invalid');
-                } else {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-            
-            // Sayfa yüklendiğinde güncelleme durumunu kontrol et
-            checkGitHubUpdates();
+                });
+            }
         });
+        
+        // WhatsApp numarası formatını kontrol et
+        $('#whatsapp_number').on('input', function() {
+            var value = $(this).val();
+            if (!/^\d+$/.test(value)) {
+                $(this).val(value.replace(/\D/g, ''));
+            }
+        });
+        
+        // iframe domainlerini kontrol et
+        $('#allowed_iframe_domains').on('input', function() {
+            var value = $(this).val();
+            // Her satırın geçerli bir domain olup olmadığını kontrol et
+            var lines = value.split('\n');
+            var valid = true;
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (line && !/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(line)) {
+                    valid = false;
+                    break;
+                }
+            }
+            if (!valid) {
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+    });
     </script>
 </body>
 </html> 

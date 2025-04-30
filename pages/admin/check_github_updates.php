@@ -5,12 +5,12 @@ require_once '../../includes/functions.php';
 
 // Giriş yapılmış mı kontrol et
 if (!isLoggedIn()) {
-    die(json_encode(['error' => 'Oturum açmanız gerekiyor']));
+    die(json_encode(['status' => 'error', 'message' => 'Oturum açmanız gerekiyor']));
 }
 
 // Admin yetkisi kontrolü
 if (!isAdmin()) {
-    die(json_encode(['error' => 'Bu işlem için yetkiniz yok']));
+    die(json_encode(['status' => 'error', 'message' => 'Bu işlem için yetkiniz yok']));
 }
 
 // Versiyon dosyası yolu
@@ -44,35 +44,48 @@ curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
 curl_close($ch);
+
+// Hata ayıklama bilgileri
+$debug = [
+    'current_version' => $currentVersion,
+    'github_url' => $githubUrl,
+    'http_code' => $httpCode,
+    'curl_error' => $curlError,
+    'response' => $response
+];
 
 if ($httpCode === 200 && $response !== false) {
     $latestVersion = trim($response);
-}
-
-// Eğer GitHub'dan versiyon alınamadıysa varsayılan değer ata
-if (empty($latestVersion)) {
-    $latestVersion = $currentVersion;
-}
-
-// Güncelleme var mı kontrol et
-$hasUpdates = version_compare($latestVersion, $currentVersion, '>');
-
-// Sonuçları döndür
-echo json_encode([
-    'hasUpdates' => $hasUpdates,
-    'currentVersion' => $currentVersion,
-    'latestVersion' => $latestVersion,
-    'debug' => [
-        'php_version' => PHP_VERSION,
-        'curl_available' => function_exists('curl_init'),
-        'version_file_exists' => file_exists($versionFile),
-        'http_code' => $httpCode,
-        'response' => $response,
-        'current_version_file' => $currentVersion,
-        'latest_version_github' => $latestVersion
-    ]
-]); 
+    
+    // Sürüm numaralarını karşılaştır
+    if (version_compare($latestVersion, $currentVersion, '>')) {
+        echo json_encode([
+            'status' => 'update',
+            'message' => 'Yeni bir güncelleme mevcut',
+            'current_version' => $currentVersion,
+            'latest_version' => $latestVersion,
+            'debug' => $debug
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'current',
+            'message' => 'Sistem güncel',
+            'current_version' => $currentVersion,
+            'latest_version' => $latestVersion,
+            'debug' => $debug
+        ]);
+    }
+} else {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'GitHub bağlantısı kurulamadı: ' . ($curlError ?: 'HTTP Kodu: ' . $httpCode),
+        'current_version' => $currentVersion,
+        'latest_version' => $currentVersion,
+        'debug' => $debug
+    ]);
+} 
  
  
  

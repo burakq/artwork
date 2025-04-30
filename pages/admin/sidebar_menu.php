@@ -108,6 +108,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <p>Doğrulama Kayıtları</p>
             </a>
         </li>
+        <li class="nav-item">
+            <a href="nfc_writing_logs.php" class="nav-link <?php echo $current_page == 'nfc_writing_logs.php' ? 'active' : ''; ?>">
+                <i class="nav-icon fas fa-clipboard-check"></i>
+                <p>NFC Yazdırma Kayıtları</p>
+            </a>
+        </li>
 
         <li class="nav-item <?php echo in_array($current_page, ['users.php', 'user_add.php', 'user_edit.php']) ? 'menu-open' : ''; ?>">
             <a href="#" class="nav-link <?php echo in_array($current_page, ['users.php', 'user_add.php', 'user_edit.php']) ? 'active' : ''; ?>">

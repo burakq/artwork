@@ -73,7 +73,12 @@ if ($statuses_result && $statuses_result->num_rows > 0) {
 
 // Sanat eserlerini getir - ID'ye göre azalan sırada (en yüksek ID ilk başta)
 $artworks = [];
-$sql = "SELECT * FROM artworks WHERE deleted_at IS NULL ORDER BY id DESC";
+$sql = "SELECT DISTINCT a.*, 
+        CASE WHEN n.id IS NOT NULL THEN 1 ELSE 0 END as nfc_written
+        FROM artworks a
+        LEFT JOIN nfc_written_logs n ON a.id = n.artwork_id
+        WHERE a.deleted_at IS NULL 
+        ORDER BY a.id DESC";
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
@@ -241,6 +246,7 @@ include 'templates/header.php';
                     <th>Boyut</th>
                     <th>Teknik</th>
                     <th>Durum</th>
+                    <th>NFC Yazıldı</th>
                     <th>Tarih</th>
                     <th>İşlemler</th>
                 </tr>
@@ -248,37 +254,30 @@ include 'templates/header.php';
             <tbody>
                 <?php foreach ($artworks as $artwork): ?>
                 <tr>
-                    <td><?php echo $artwork['id']; ?></td>
+                    <td><?php echo htmlspecialchars($artwork['id']); ?></td>
                     <td>
                         <?php if (!empty($artwork['image_path'])): ?>
-                            <img data-src="../../<?php echo $artwork['image_path']; ?>" alt="<?php echo htmlspecialchars($artwork['title']); ?>" class="artwork-thumbnail lazy-load" src="../../assets/img/placeholder.php">
+                            <img data-src="../../<?php echo htmlspecialchars($artwork['image_path']); ?>" 
+                                 alt="<?php echo htmlspecialchars($artwork['title']); ?>"
+                                 class="artwork-thumbnail lazy-load" 
+                                 src="../../assets/img/placeholder.php">
                         <?php else: ?>
                             <span class="badge badge-secondary">Resim Yok</span>
                         <?php endif; ?>
                     </td>
                     <td><?php echo htmlspecialchars($artwork['title']); ?></td>
                     <td><?php echo htmlspecialchars($artwork['verification_code']); ?></td>
-                    <td><?php echo htmlspecialchars($artwork['dimensions'] . ' ' . $artwork['size']); ?></td>
-                    <td><?php echo isset($techniques[$artwork['technique']]) ? htmlspecialchars($techniques[$artwork['technique']]) : htmlspecialchars($artwork['technique']); ?></td>
+                    <td><?php echo htmlspecialchars($artwork['dimensions']); ?></td>
+                    <td><?php echo isset($techniques[$artwork['technique']]) ? htmlspecialchars($techniques[$artwork['technique']]) : ''; ?></td>
+                    <td><?php echo isset($statuses[$artwork['status']]) ? htmlspecialchars($statuses[$artwork['status']]) : ''; ?></td>
                     <td>
-                        <?php
-                        // Status değerine karşılık gelen ismi $statuses dizisinden al
-                        $status_text = isset($statuses[$artwork['status']]) ? $statuses[$artwork['status']] : $artwork['status'];
-                        
-                        // Durum anahtarlarına göre renkler
-                        if ($artwork['status'] == 'satildi') {
-                            $status_class = 'badge-danger';
-                        } elseif ($artwork['status'] == 'satista') {
-                            $status_class = 'badge-warning';
-                        } elseif ($artwork['status'] == 'arsiv') {
-                            $status_class = 'badge-secondary';
-                        } else {
-                            $status_class = 'badge-info';
-                        }
-                        ?>
-                        <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
+                        <?php if ($artwork['nfc_written']): ?>
+                            <span class="badge badge-success">Yazıldı</span>
+                        <?php else: ?>
+                            <span class="badge badge-secondary">Yazılmadı</span>
+                        <?php endif; ?>
                     </td>
-                    <td><?php echo !empty($artwork['print_date']) ? date('d.m.Y', strtotime($artwork['print_date'])) : '-'; ?></td>
+                    <td><?php echo date('d.m.Y', strtotime($artwork['created_at'])); ?></td>
                     <td>
                         <div class="btn-group">
                             <a href="artwork_view.php?id=<?php echo $artwork['id']; ?>" class="btn btn-sm btn-info" title="Görüntüle">
