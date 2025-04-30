@@ -90,7 +90,7 @@ try {
         'includes/functions.php',
         'pages/admin/templates/header.php',
         'pages/admin/templates/footer.php',
-        'pages/admin/templates/sidebar.php'
+        'pages/admin/templates/sidebar_menu.php'
     ];
 
     foreach ($requiredFiles as $file) {
