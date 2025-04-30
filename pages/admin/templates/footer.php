@@ -1,34 +1,33 @@
+                </div><!-- /.container-fluid -->
+            </section><!-- /.content -->
+        </div><!-- /.content-wrapper -->
+
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-block">
+                <b>Version</b> 1.0.0
             </div>
-        </section>
+            <strong>Copyright © 2025 <a href="../../index.php">Artwork Auth</a>.</strong> Tüm hakları saklıdır.
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
     </div>
+    <!-- ./wrapper -->
 
-    <footer class="footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">© <?php echo date('Y'); ?> Artwork Authentication. Tüm hakları saklıdır.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <p class="mb-0">Version: <?php 
-                        $versionFile = __DIR__ . '/../../../../version.txt';
-                        if (file_exists($versionFile)) {
-                            echo file_get_contents($versionFile);
-                        } else {
-                            echo 'v1.0.5';
-                        }
-                    ?></p>
-                </div>
-            </div>
-        </div>
-    </footer>
-</div>
-
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE 3 -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-<?php if (isset($additional_js)) echo $additional_js; ?>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <?php if (isset($additional_js)) echo $additional_js; ?>
 </body>
 </html> 

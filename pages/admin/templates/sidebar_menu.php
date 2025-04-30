@@ -40,6 +40,13 @@
                         <span>Doğrulama Logları</span>
                     </a>
                 </li>
+                <!-- NFC Yazma Logları -->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo ($current_page == 'nfc_writing_logs.php') ? 'active' : ''; ?>" href="nfc_writing_logs.php">
+                        <i class="fas fa-pen"></i>
+                        <span>NFC Yazma Logları</span>
+                    </a>
+                </li>
                 <!-- Kullanıcı Yönetimi -->
                 <li class="nav-item">
                     <a class="nav-link <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>" href="users.php">
